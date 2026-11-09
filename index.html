@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>하늬 칭찬해요 · 선생님</title>
+<style>
+  :root {
+    --bg: #000; --s1: #1C1C1E; --s2: #2C2C2E; --line: #48484A;
+    --text: #fff; --muted: #A1A1A6; --accent: #FF5A4E; --heart: #FF5A7A;
+    --yellow: #FFD24A; --green: #6EE07A;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif; }
+  main { max-width: 480px; margin: 0 auto; padding: 20px 16px 48px; }
+  h1 { margin: 0; font-size: 22px; text-align: center; }
+  h1 .heart { color: var(--heart); }
+  .sub { text-align: center; color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .total { display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-size: 30px; font-weight: 800; margin: 18px 0 2px; }
+  .total b { color: var(--accent); }
+  .meta { text-align: center; color: var(--muted); font-size: 13px; }
+  .status { text-align: center; font-size: 13px; margin-top: 6px; min-height: 18px; }
+  .tabs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin: 22px 0 18px; }
+  .tab { border: 0; border-radius: 18px; background: var(--s1); color: var(--text); padding: 10px 0 8px;
+    display: flex; flex-direction: column; align-items: center; gap: 2px; font: inherit; cursor: pointer; }
+  .tab .d { font-size: 22px; font-weight: 800; }
+  .tab .c { font-size: 13px; color: var(--muted); }
+  .tab .c b { color: var(--accent); }
+  .tab.today .t { color: var(--yellow); }
+  .tab .t { font-size: 11px; min-height: 14px; color: transparent; }
+  .tab.sel { background: var(--s2); box-shadow: 0 0 0 3px var(--yellow); }
+  .dayhead { text-align: center; font-size: 22px; font-weight: 800; }
+  .dayhead b { color: var(--accent); }
+  .hint { text-align: center; color: var(--muted); font-size: 13px; margin: 4px 0 16px; }
+  .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; justify-items: center; }
+  .grid.seven { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .slot { width: 100%; max-width: 120px; aspect-ratio: 1; border-radius: 50%; border: 3px dashed var(--line);
+    background: #0F0F10; color: var(--text); font: inherit; cursor: pointer; padding: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .slot .n { font-size: 28px; font-weight: 800; line-height: 1; }
+  .slot .l { font-size: 13px; color: var(--muted); }
+  .slot.off { border: 0; cursor: default;
+    background: repeating-linear-gradient(45deg, #2C2C2E 0 7px, #161618 7px 14px); }
+  .slot.off .n { color: #8E8E93; } .slot.off .l { color: #AEAEB2; }
+  .slot.on { border: 0; background: transparent; }
+  .seal { width: 100%; height: 100%; border-radius: 50%; border: 4px solid var(--accent);
+    box-shadow: inset 0 0 0 3px #000, inset 0 0 0 5px var(--accent); color: var(--accent);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    transform: rotate(-8deg); font-weight: 800; font-size: 13px; }
+  .seal svg { width: 44%; height: 44%; }
+  .seal.pop { animation: pop .42s ease-out both; }
+  @keyframes pop { 0% { transform: scale(2.2) rotate(-25deg); opacity: 0 } 70% { transform: scale(.92) rotate(-6deg); opacity: 1 } 100% { transform: scale(1) rotate(-8deg); opacity: 1 } }
+  .card { background: var(--s1); border-radius: 18px; padding: 16px; margin-top: 28px; }
+  .card h2 { margin: 0 0 8px; font-size: 16px; }
+  .card p { margin: 6px 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+  .req { display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    background: var(--s2); border-radius: 12px; padding: 10px 12px; margin-top: 8px; }
+  .req b { font-size: 18px; letter-spacing: 1px; color: var(--yellow); }
+  .btn { border: 0; border-radius: 999px; padding: 0 20px; min-height: 44px; font: inherit; font-weight: 700;
+    cursor: pointer; background: var(--text); color: #000; }
+  .btn.ghost { background: var(--s2); color: var(--text); }
+  .btn.small { min-height: 36px; padding: 0 14px; font-size: 14px; }
+  .center { text-align: center; }
+  .login { margin-top: 60px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+    background: #fff; color: #000; border-radius: 999px; padding: 10px 10px 10px 18px;
+    display: none; align-items: center; gap: 10px; font-size: 14px; font-weight: 700;
+    box-shadow: 0 6px 20px rgba(0,0,0,.4); max-width: calc(100% - 32px); }
+  .toast.show { display: flex; }
+  .toast button { border: 0; background: #000; color: #fff; border-radius: 999px; min-height: 36px;
+    padding: 0 14px; font: inherit; font-weight: 700; cursor: pointer; }
+  .foot { text-align: center; margin-top: 22px; }
+  .foot button { background: none; border: 0; color: var(--muted); font: inherit; font-size: 13px;
+    text-decoration: underline; cursor: pointer; min-height: 44px; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <h1>하늬 칭찬해요 <span class="heart">♥</span></h1>
+  <div class="sub">선생님용 원격 도장</div>
+
+  <section id="loginView" class="login hidden">
+    <label for="pinInput" class="center" style="color: var(--muted); font-size: 14px">이 폰에서 처음 한 번만 도장 비밀번호를 넣어 주세요.</label>
+    <input id="pinInput" type="password" inputmode="numeric" maxlength="4" autocomplete="off"
+      style="width: 160px; height: 52px; border-radius: 14px; border: 2px solid var(--line); background: var(--s1); color: var(--text); font-size: 26px; text-align: center; letter-spacing: 10px">
+    <button class="btn" id="loginBtn">확인</button>
+    <p id="loginMsg" class="center" style="color: #FF8A80; font-size: 13px; margin: 0"></p>
+  </section>
+
+  <section id="mainView" class="hidden">
+    <div class="total">
+      <svg width="34" height="34" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="10" width="4.5" height="11" rx="1" fill="#FF5A4E"></rect><path d="M8.5 21V10.5L12.6 3.2c.3-.5.8-.7 1.3-.6 1.2.3 1.9 1.5 1.6 2.7L14.6 9H20a2 2 0 0 1 2 2.3l-1.3 7.5A2.6 2.6 0 0 1 18.1 21H8.5z" fill="#FF5A4E"></path></svg>
+      <span>잘했어요 <b id="total">0</b>개</span>
+    </div>
+    <div class="meta" id="lastWeek">지난 주 0개 · 월요일마다 새로 시작</div>
+    <div class="status" id="status"></div>
+
+    <div class="tabs" id="tabs"></div>
+    <div class="dayhead" id="dayhead"></div>
+    <div class="hint">빈칸을 누르면 도장이 바로 찍혀요</div>
+    <div class="grid" id="grid"></div>
+
+    <div class="foot"><button id="logoutBtn">이 폰에서 잠그기</button></div>
+  </section>
+</main>
+
+<div class="toast" id="toast" role="status"><span id="toastText"></span><button id="undoBtn">되돌리기</button></div>
+
+<script type="module">
+// ───── Firebase 설정값 (선생님 Firebase 프로젝트 값으로 채워요) ─────
+const firebaseConfig = {
+  apiKey: "AIzaSyC0rbFrct_9AgaVffxxcqitqJCJufRS9_Q",
+  authDomain: "hani-praise.firebaseapp.com",
+  projectId: "hani-praise",
+  appId: "1:393810829326:web:3243edf0aee350be9a9c5f"
+};
+const STUDENT_ID = "hani";
+const PIN = "0802";   // 도장 비밀번호 (폰마다 처음 한 번)
+
+// ───── 시간표 (워치 앱과 같아야 해요) ─────
+const SHORT = ["월", "화", "수", "목", "금"];
+const FULL = ["월요일", "화요일", "수요일", "목요일", "금요일"];
+const PERIODS = [6, 7, 6, 7, 6];
+const LEAVE_FROM = { 1: 6 };   // 화요일 6교시부터 조퇴
+const isOff = (d, n) => LEAVE_FROM[d] !== undefined && n >= LEAVE_FROM[d];
+const avail = (d) => LEAVE_FROM[d] !== undefined ? LEAVE_FROM[d] - 1 : PERIODS[d];
+const decode = (s, n) => Array.from({ length: n }, (_, i) => (s || "")[i] === "1");
+const encode = (a) => a.map(v => v ? "1" : "0").join("");
+const countDay = (d, s) => decode(s, PERIODS[d]).filter((v, i) => v && !isOff(d, i + 1)).length;
+
+function mondayStr(weeksAgo = 0) {
+  const t = new Date();
+  const day = (t.getDay() + 6) % 7;
+  t.setDate(t.getDate() - day - 7 * weeksAgo);
+  return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`;
+}
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, onSnapshot, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const $ = (id) => document.getElementById(id);
+// 교사용 링크의 #k=... 부분이 비밀 열쇠예요 (한 번 열면 이 폰에 기억)
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+  del(k) { try { localStorage.removeItem(k); } catch (e) {} }
+};
+const hashKey = new URLSearchParams(location.hash.slice(1)).get("k");
+if (hashKey) store.set("hani-key", hashKey);
+const ROOM_KEY = hashKey || store.get("hani-key");
+
+function showLogin(msg) {
+  $("mainView").classList.add("hidden");
+  $("loginView").classList.remove("hidden");
+  $("loginMsg").textContent = msg || "";
+}
+
+if (!ROOM_KEY) {
+  showLogin("선생님께 받은 링크(주소 끝에 #k=… 가 붙은 것)로 열어 주세요.");
+  $("pinInput").disabled = true;
+  $("loginBtn").disabled = true;
+  throw new Error("no key");
+}
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const studentRef = doc(db, "rooms", ROOM_KEY, "students", STUDENT_ID);
+
+let data = null;
+const todayIdx = (new Date().getDay() + 6) % 7;
+let sel = todayIdx <= 4 ? todayIdx : 0;
+let pop = null;
+let unsub = null;
+
+// ── 비밀번호 (폰마다 처음 한 번) ──
+async function enter() {
+  $("loginView").classList.add("hidden");
+  $("mainView").classList.remove("hidden");
+  $("status").innerHTML = '<span style="color: var(--muted)">연결하는 중…</span>';
+  try {
+    await signInAnonymously(auth);
+    start();
+  } catch (e) {
+    $("status").innerHTML = '<span style="color:#FF8A80">연결하지 못했어요. Firebase에서 \'익명\' 로그인이 켜져 있는지 확인해 주세요.</span>';
+  }
+}
+$("loginBtn").onclick = () => {
+  if ($("pinInput").value === PIN) { store.set("hani-ok", "1"); $("pinInput").value = ""; enter(); }
+  else { $("loginMsg").textContent = "비밀번호가 달라요"; $("pinInput").value = ""; }
+};
+$("pinInput").addEventListener("keydown", (e) => { if (e.key === "Enter") $("loginBtn").click(); });
+$("logoutBtn").onclick = () => { store.del("hani-ok"); if (unsub) unsub(); unsub = null; showLogin(""); };
+
+if (store.get("hani-ok") === "1") enter(); else showLogin("");
+
+// ── 실시간 반영 ──
+function start() {
+  if (unsub) unsub();
+  unsub = onSnapshot(studentRef, { includeMetadataChanges: true }, (snap) => {
+    data = snap.exists() ? snap.data() : null;
+    if (!data || data.week !== mondayStr()) { ensureWeek(); }
+    $("status").innerHTML = snap.metadata.hasPendingWrites
+      ? '<span style="color: var(--muted)">보내는 중…</span>'
+      : '<span style="color: var(--green)">● 저장됨 · 워치는 앱이 켜져 있으면 몇 초 안에 받아요</span>';
+    render();
+  }, () => { $("status").innerHTML = '<span style="color:#FF8A80">기록을 불러오지 못했어요 (보안 규칙 확인)</span>'; });
+}
+
+// 새 주가 되면 비우고 지난 주 개수 남기기
+function rolled(cur) {
+  const mon = mondayStr();
+  if (cur && cur.week === mon) return { ...cur };
+  const last = cur && cur.week === mondayStr(1) ? [0, 1, 2, 3, 4].reduce((s, d) => s + countDay(d, cur["d" + d]), 0) : 0;
+  return { week: mon, lastWeek: last, d0: "", d1: "", d2: "", d3: "", d4: "" };
+}
+let ensuring = false;
+async function ensureWeek() {
+  if (ensuring) return; ensuring = true;
+  try {
+    await runTransaction(db, async (tx) => {
+      const s = await tx.get(studentRef);
+      const cur = s.exists() ? s.data() : null;
+      if (cur && cur.week === mondayStr()) return;
+      tx.set(studentRef, { ...rolled(cur), updatedBy: "teacher", updatedAt: serverTimestamp() });
+    });
+  } finally { ensuring = false; }
+}
+
+async function setBit(d, i, val) {
+  await runTransaction(db, async (tx) => {
+    const s = await tx.get(studentRef);
+    const cur = rolled(s.exists() ? s.data() : null);
+    const arr = decode(cur["d" + d], PERIODS[d]);
+    arr[i] = val;
+    cur["d" + d] = encode(arr);
+    tx.set(studentRef, { ...cur, updatedBy: "teacher", updatedAt: serverTimestamp() });
+  });
+}
+
+// ── 화면 그리기 ──
+const THUMB = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="10" width="4.5" height="11" rx="1" fill="currentColor"></rect><path d="M8.5 21V10.5L12.6 3.2c.3-.5.8-.7 1.3-.6 1.2.3 1.9 1.5 1.6 2.7L14.6 9H20a2 2 0 0 1 2 2.3l-1.3 7.5A2.6 2.6 0 0 1 18.1 21H8.5z" fill="currentColor"></path></svg>';
+
+function render() {
+  const cur = rolled(data);
+  const total = [0, 1, 2, 3, 4].reduce((s, d) => s + countDay(d, cur["d" + d]), 0);
+  $("total").textContent = total;
+  $("lastWeek").textContent = `지난 주 ${cur.lastWeek || 0}개 · 월요일마다 새로 시작`;
+
+  const tabs = $("tabs");
+  tabs.innerHTML = "";
+  for (let d = 0; d < 5; d++) {
+    const b = document.createElement("button");
+    b.className = "tab" + (d === sel ? " sel" : "") + (d === todayIdx ? " today" : "");
+    b.innerHTML = `<span class="t">오늘</span><span class="d">${SHORT[d]}</span><span class="c"><b>${countDay(d, cur["d" + d])}</b>/${avail(d)}</span>`;
+    b.setAttribute("aria-label", `${FULL[d]} 도장 ${countDay(d, cur["d" + d])}개`);
+    b.onclick = () => { sel = d; pop = null; render(); };
+    tabs.append(b);
+  }
+
+  $("dayhead").innerHTML = `${FULL[sel]} <b>${countDay(sel, cur["d" + sel])}</b>개`;
+  const grid = $("grid");
+  grid.className = "grid" + (PERIODS[sel] > 6 ? " seven" : "");
+  grid.innerHTML = "";
+  const arr = decode(cur["d" + sel], PERIODS[sel]);
+  for (let i = 0; i < PERIODS[sel]; i++) {
+    const n = i + 1;
+    const off = isOff(sel, n);
+    const on = arr[i] && !off;
+    const b = document.createElement("button");
+    b.className = "slot" + (off ? " off" : on ? " on" : "");
+    if (off) {
+      b.disabled = true;
+      b.innerHTML = `<span class="n">${n}</span><span class="l">조퇴</span>`;
+      b.setAttribute("aria-label", `${n}교시 조퇴`);
+    } else if (on) {
+      const isPop = pop && pop[0] === sel && pop[1] === i;
+      b.innerHTML = `<span class="seal${isPop ? " pop" : ""}">${THUMB}<span>${n}교시</span></span>`;
+      b.setAttribute("aria-label", `${n}교시 도장 있음, 눌러서 지우기`);
+      b.onclick = async () => {
+        if (!confirm(`${FULL[sel]} ${n}교시 도장을 지울까요?`)) return;
+        pop = null;
+        await setBit(sel, i, false);
+      };
+    } else {
+      b.innerHTML = `<span class="n">${n}</span><span class="l">교시</span>`;
+      b.setAttribute("aria-label", `${n}교시 빈칸, 눌러서 도장 찍기`);
+      b.onclick = async () => {
+        const d = sel;
+        pop = [d, i];
+        if (navigator.vibrate) navigator.vibrate(40);
+        await setBit(d, i, true);
+        toast(`${FULL[d]} ${n}교시 도장을 찍었어요`, () => setBit(d, i, false));
+      };
+    }
+    grid.append(b);
+  }
+}
+
+let toastTimer = null;
+function toast(text, undo) {
+  $("toastText").textContent = text;
+  $("toast").classList.add("show");
+  $("undoBtn").onclick = async () => { $("toast").classList.remove("show"); pop = null; await undo(); };
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => $("toast").classList.remove("show"), 5000);
+}
+</script>
+</body>
+</html>
