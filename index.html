@@ -2,313 +2,343 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#000000">
-<title>하늬 칭찬해요 · 선생님</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>참 잘했어요! 교사 관리</title>
 <style>
-  :root {
-    --bg: #000; --s1: #1C1C1E; --s2: #2C2C2E; --line: #48484A;
-    --text: #fff; --muted: #A1A1A6; --accent: #FF5A4E; --heart: #FF5A7A;
-    --yellow: #FFD24A; --green: #6EE07A;
-  }
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  body { margin: 0; background: var(--bg); color: var(--text);
-    font-family: -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif; }
-  main { max-width: 480px; margin: 0 auto; padding: 20px 16px 48px; }
-  h1 { margin: 0; font-size: 22px; text-align: center; }
-  h1 .heart { color: var(--heart); }
-  .sub { text-align: center; color: var(--muted); font-size: 13px; margin-top: 2px; }
-  .total { display: flex; align-items: center; justify-content: center; gap: 8px;
-    font-size: 30px; font-weight: 800; margin: 18px 0 2px; }
-  .total b { color: var(--accent); }
-  .meta { text-align: center; color: var(--muted); font-size: 13px; }
-  .status { text-align: center; font-size: 13px; margin-top: 6px; min-height: 18px; }
-  .tabs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin: 22px 0 18px; }
-  .tab { border: 0; border-radius: 18px; background: var(--s1); color: var(--text); padding: 10px 0 8px;
-    display: flex; flex-direction: column; align-items: center; gap: 2px; font: inherit; cursor: pointer; }
-  .tab .d { font-size: 22px; font-weight: 800; }
-  .tab .c { font-size: 13px; color: var(--muted); }
-  .tab .c b { color: var(--accent); }
-  .tab.today .t { color: var(--yellow); }
-  .tab .t { font-size: 11px; min-height: 14px; color: transparent; }
-  .tab.sel { background: var(--s2); box-shadow: 0 0 0 3px var(--yellow); }
-  .dayhead { text-align: center; font-size: 22px; font-weight: 800; }
-  .dayhead b { color: var(--accent); }
-  .hint { text-align: center; color: var(--muted); font-size: 13px; margin: 4px 0 16px; }
-  .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; justify-items: center; }
-  .grid.seven { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
-  .slot { width: 100%; max-width: 120px; aspect-ratio: 1; border-radius: 50%; border: 3px dashed var(--line);
-    background: #0F0F10; color: var(--text); font: inherit; cursor: pointer; padding: 0;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; }
-  .slot .n { font-size: 28px; font-weight: 800; line-height: 1; }
-  .slot .l { font-size: 13px; color: var(--muted); }
-  .slot.off { border: 0; cursor: default;
-    background: repeating-linear-gradient(45deg, #2C2C2E 0 7px, #161618 7px 14px); }
-  .slot.off .n { color: #8E8E93; } .slot.off .l { color: #AEAEB2; }
-  .slot.on { border: 0; background: transparent; }
-  .seal { width: 100%; height: 100%; border-radius: 50%; border: 4px solid var(--accent);
-    box-shadow: inset 0 0 0 3px #000, inset 0 0 0 5px var(--accent); color: var(--accent);
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-    transform: rotate(-8deg); font-weight: 800; font-size: 13px; }
-  .seal svg { width: 44%; height: 44%; }
-  .seal.pop { animation: pop .42s ease-out both; }
-  @keyframes pop { 0% { transform: scale(2.2) rotate(-25deg); opacity: 0 } 70% { transform: scale(.92) rotate(-6deg); opacity: 1 } 100% { transform: scale(1) rotate(-8deg); opacity: 1 } }
-  .card { background: var(--s1); border-radius: 18px; padding: 16px; margin-top: 28px; }
-  .card h2 { margin: 0 0 8px; font-size: 16px; }
-  .card p { margin: 6px 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
-  .req { display: flex; align-items: center; justify-content: space-between; gap: 8px;
-    background: var(--s2); border-radius: 12px; padding: 10px 12px; margin-top: 8px; }
-  .req b { font-size: 18px; letter-spacing: 1px; color: var(--yellow); }
-  .btn { border: 0; border-radius: 999px; padding: 0 20px; min-height: 44px; font: inherit; font-weight: 700;
-    cursor: pointer; background: var(--text); color: #000; }
-  .btn.ghost { background: var(--s2); color: var(--text); }
-  .btn.small { min-height: 36px; padding: 0 14px; font-size: 14px; }
-  .center { text-align: center; }
-  .login { margin-top: 60px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
-  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
-    background: #fff; color: #000; border-radius: 999px; padding: 10px 10px 10px 18px;
-    display: none; align-items: center; gap: 10px; font-size: 14px; font-weight: 700;
-    box-shadow: 0 6px 20px rgba(0,0,0,.4); max-width: calc(100% - 32px); }
-  .toast.show { display: flex; }
-  .toast button { border: 0; background: #000; color: #fff; border-radius: 999px; min-height: 36px;
-    padding: 0 14px; font: inherit; font-weight: 700; cursor: pointer; }
-  .foot { text-align: center; margin-top: 22px; }
-  .foot button { background: none; border: 0; color: var(--muted); font: inherit; font-size: 13px;
-    text-decoration: underline; cursor: pointer; min-height: 44px; }
-  .hidden { display: none !important; }
+:root{--a:#FF5A4E;--y:#FFD24A;--m:#8e8e93;--bg:#f4f4f6;--card:#fff;--line:#e6e6ea;--g:#1f9d55;--err:#d93025}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Pretendard","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;background:var(--bg);color:#111;min-height:100vh}
+header{background:#000;color:#fff;padding:14px 28px;display:flex;align-items:center;gap:16px}
+.stamp{display:inline-block;color:var(--a);border:3px solid var(--a);border-radius:12px;padding:0 12px;font-size:22px;font-weight:900;transform:rotate(-4deg);box-shadow:inset 0 0 0 2px #000,inset 0 0 0 4px var(--a)}
+header .t{font-size:16px;color:#ccc}header .sp{flex:1}
+header button{background:#2c2c2e;color:#fff}
+main{max-width:1080px;margin:24px auto;padding:0 16px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:860px){main{grid-template-columns:1fr}}
+.card{background:var(--card);border-radius:18px;padding:20px 22px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.card.wide{grid-column:1/-1}
+h2{font-size:18px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+h2 small{font-size:13px;color:var(--m);font-weight:400}
+p.note{font-size:13px;color:var(--m);line-height:1.6;margin-bottom:10px}
+input,select{height:40px;border:1px solid var(--line);border-radius:10px;padding:0 12px;font-size:15px;font-family:inherit;background:#fff}
+input:focus{outline:2px solid var(--a);border-color:transparent}
+button{height:40px;border:none;border-radius:10px;padding:0 16px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;background:#eee;color:#111}
+button.p{background:var(--a);color:#fff}button.sm{height:32px;padding:0 12px;font-size:13px}
+button.ghost{background:#fff;border:1px solid var(--line)}button.danger{background:#fff;color:var(--err);border:1px solid #f3c7c3}
+button:disabled{opacity:.5;cursor:default}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.row input{flex:1;min-width:120px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:10px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:12px;color:var(--m);font-weight:600}
+.bar{height:8px;background:#eee;border-radius:4px;overflow:hidden;width:90px;display:inline-block;vertical-align:middle;margin-right:6px}.bar i{display:block;height:100%;background:var(--a)}
+.badge{display:inline-block;font-size:12px;font-weight:700;border-radius:8px;padding:2px 8px;background:#e7f6ec;color:var(--g)}
+.badge.w{background:#fff6d6;color:#9a7300}
+.code{font-size:40px;font-weight:900;letter-spacing:6px;color:#b17f00;background:#fffbea;border-radius:14px;text-align:center;padding:14px;margin:8px 0}
+.msg{font-size:14px;min-height:20px;margin-top:6px}.msg.err{color:var(--err)}.msg.ok{color:var(--g)}
+#login{max-width:420px;margin:60px auto;padding:0 16px}
+#login .card{padding:30px}
+#login h1{font-size:22px;margin:20px 0 6px}
+#login input{width:100%;margin-bottom:10px}
+#login button{width:100%;margin-top:4px}
+.link{color:var(--m);font-size:14px;text-align:center;margin-top:14px;cursor:pointer;text-decoration:underline}
+.tt{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:8px 0}
+.tt div{background:#f6f6f8;border-radius:10px;padding:8px;text-align:center;font-size:13px}
+.tt input,.tt select{width:100%;height:32px;font-size:13px;padding:0 6px;margin-top:4px}
+dialog{border:none;border-radius:18px;padding:22px;max-width:520px;width:92%}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+.hidden{display:none!important}
 </style>
 </head>
 <body>
-<main>
-  <h1>하늬 칭찬해요 <span class="heart">♥</span></h1>
-  <div class="sub">선생님용 원격 도장</div>
 
-  <section id="loginView" class="login hidden">
-    <label for="pinInput" class="center" style="color: var(--muted); font-size: 14px">이 폰에서 처음 한 번만 도장 비밀번호를 넣어 주세요.</label>
-    <input id="pinInput" type="password" inputmode="numeric" maxlength="4" autocomplete="off"
-      style="width: 160px; height: 52px; border-radius: 14px; border: 2px solid var(--line); background: var(--s1); color: var(--text); font-size: 26px; text-align: center; letter-spacing: 10px">
-    <button class="btn" id="loginBtn">확인</button>
-    <p id="loginMsg" class="center" style="color: #FF8A80; font-size: 13px; margin: 0"></p>
-  </section>
+<section id="login">
+  <div class="card">
+    <span class="stamp">참 잘했어요!</span>
+    <h1>교사 관리 페이지</h1>
+    <p class="note">선생님 앱과 같은 계정으로 로그인하세요. 가입과 반 만들기는 선생님 앱에서 해요.</p>
+    <input id="email" type="email" placeholder="이메일" autocomplete="username">
+    <input id="pw" type="password" placeholder="비밀번호" autocomplete="current-password">
+    <button class="p" id="btnLogin">로그인</button>
+    <div class="msg" id="loginMsg"></div>
+    <div class="link" id="btnForgot">비밀번호를 잊었어요 (재설정 메일 받기)</div>
+  </div>
+</section>
 
-  <section id="mainView" class="hidden">
-    <div class="total">
-      <svg width="34" height="34" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="10" width="4.5" height="11" rx="1" fill="#FF5A4E"></rect><path d="M8.5 21V10.5L12.6 3.2c.3-.5.8-.7 1.3-.6 1.2.3 1.9 1.5 1.6 2.7L14.6 9H20a2 2 0 0 1 2 2.3l-1.3 7.5A2.6 2.6 0 0 1 18.1 21H8.5z" fill="#FF5A4E"></path></svg>
-      <span>잘했어요 <b id="total">0</b>개</span>
+<div id="app" class="hidden">
+  <header>
+    <span class="stamp">참 잘했어요!</span>
+    <span class="t" id="hdrClass">우리 반</span>
+    <span class="sp"></span>
+    <span class="t" id="hdrEmail"></span>
+    <button class="sm" id="btnLogout">로그아웃</button>
+  </header>
+  <main>
+    <div class="card">
+      <h2>🔒 도장 비밀번호 <small>워치·태블릿에서 쓰는 4자리</small></h2>
+      <p class="note">잊어버렸다면 여기서 새로 정하면 돼요. 연결된 기기에 바로 적용돼요.</p>
+      <div class="row"><input id="pin1" type="password" inputmode="numeric" maxlength="4" placeholder="새 4자리"><input id="pin2" type="password" inputmode="numeric" maxlength="4" placeholder="한 번 더"><button class="p" id="btnPin">바꾸기</button></div>
+      <div class="msg" id="pinMsg"></div>
     </div>
-    <div class="meta" id="lastWeek">지난 주 0개 · 월요일마다 새로 시작</div>
-    <div class="status" id="status"></div>
 
-    <div class="tabs" id="tabs"></div>
-    <div class="dayhead" id="dayhead"></div>
-    <div class="hint">빈칸을 누르면 도장이 바로 찍혀요</div>
-    <div class="grid" id="grid"></div>
+    <div class="card">
+      <h2>🔑 계정 비밀번호</h2>
+      <div class="row"><input id="oldPw" type="password" placeholder="지금 비밀번호" autocomplete="current-password"></div>
+      <div class="row"><input id="newPw1" type="password" placeholder="새 비밀번호 (6자 이상)" autocomplete="new-password"><input id="newPw2" type="password" placeholder="한 번 더" autocomplete="new-password"></div>
+      <div class="row"><button class="p" id="btnPw">바꾸기</button><button class="ghost" id="btnReset">재설정 메일 받기</button></div>
+      <div class="msg" id="pwMsg"></div>
+    </div>
 
-    <div class="foot"><button id="logoutBtn">이 폰에서 잠그기</button></div>
-  </section>
-</main>
+    <div class="card wide">
+      <h2>⌚ 기기 연결 <small>승인 대기 중인 기기를 승인하거나, 연결을 해지해요</small></h2>
+      <table><thead><tr><th>기기</th><th>학생</th><th>코드</th><th>상태</th><th></th></tr></thead><tbody id="devBody"></tbody></table>
+      <div class="row" style="margin-top:12px"><button class="ghost" id="btnTabletCode">🖥 태블릿 연결 코드 만들기</button></div>
+    </div>
 
-<div class="toast" id="toast" role="status"><span id="toastText"></span><button id="undoBtn">되돌리기</button></div>
+    <div class="card wide">
+      <h2>🧒 학생 <small id="stCount"></small></h2>
+      <div class="row"><input id="newName" placeholder="이름 또는 별명" maxlength="12"><button class="p" id="btnAdd">학생 등록</button></div>
+      <table><thead><tr><th>이름</th><th>이번 주</th><th>지난 주</th><th>시간표 (교시/조퇴)</th><th></th></tr></thead><tbody id="stBody"></tbody></table>
+    </div>
+
+    <div class="card">
+      <h2>🏫 반 이름</h2>
+      <div class="row"><input id="className" maxlength="20"><button class="p" id="btnClassName">저장</button></div>
+      <div class="msg" id="classMsg"></div>
+    </div>
+    <div class="card">
+      <h2>ℹ️ 도움말</h2>
+      <p class="note">• 도장은 선생님 앱, 워치(비밀번호), 학급게시 태블릿(비밀번호)에서 찍어요.<br>• 학생폰 앱은 보기만 할 수 있어요.<br>• 계정 삭제는 선생님 앱 › 관리 › 계정 삭제에서 할 수 있어요.</p>
+    </div>
+  </main>
+</div>
+
+<dialog id="dlg"><div id="dlgBody"></div><div class="row" style="justify-content:flex-end;margin-top:14px"><button class="ghost" id="dlgClose">닫기</button></div></dialog>
 
 <script type="module">
-// ───── Firebase 설정값 (선생님 Firebase 프로젝트 값으로 채워요) ─────
+// ───────── Firebase 설정값 (앱의 core/Firebase.kt 와 같은 값) ─────────
 const firebaseConfig = {
   apiKey: "AIzaSyC0rbFrct_9AgaVffxxcqitqJCJufRS9_Q",
   authDomain: "hani-praise.firebaseapp.com",
   projectId: "hani-praise",
-  appId: "1:393810829326:web:3243edf0aee350be9a9c5f"
 };
-const STUDENT_ID = "hani";
-const PIN = "0802";   // 도장 비밀번호 (폰마다 처음 한 번)
-
-// ───── 시간표 (워치 앱과 같아야 해요) ─────
-const SHORT = ["월", "화", "수", "목", "금"];
-const FULL = ["월요일", "화요일", "수요일", "목요일", "금요일"];
-const PERIODS = [6, 7, 6, 7, 6];
-const LEAVE_FROM = { 1: 6 };   // 화요일 6교시부터 조퇴
-const isOff = (d, n) => LEAVE_FROM[d] !== undefined && n >= LEAVE_FROM[d];
-const avail = (d) => LEAVE_FROM[d] !== undefined ? LEAVE_FROM[d] - 1 : PERIODS[d];
-const decode = (s, n) => Array.from({ length: n }, (_, i) => (s || "")[i] === "1");
-const encode = (a) => a.map(v => v ? "1" : "0").join("");
-const countDay = (d, s) => decode(s, PERIODS[d]).filter((v, i) => v && !isOff(d, i + 1)).length;
-
-function mondayStr(weeksAgo = 0) {
-  const t = new Date();
-  const day = (t.getDay() + 6) % 7;
-  t.setDate(t.getDate() - day - 7 * weeksAgo);
-  return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`;
-}
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, doc, onSnapshot, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-const $ = (id) => document.getElementById(id);
-// 교사용 링크의 #k=... 부분이 비밀 열쇠예요 (한 번 열면 이 폰에 기억)
-const store = {
-  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
-  set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
-  del(k) { try { localStorage.removeItem(k); } catch (e) {} }
-};
-const hashKey = new URLSearchParams(location.hash.slice(1)).get("k");
-if (hashKey) store.set("hani-key", hashKey);
-const ROOM_KEY = hashKey || store.get("hani-key");
-
-function showLogin(msg) {
-  $("mainView").classList.add("hidden");
-  $("loginView").classList.remove("hidden");
-  $("loginMsg").textContent = msg || "";
-}
-
-if (!ROOM_KEY) {
-  showLogin("선생님께 받은 링크(주소 끝에 #k=… 가 붙은 것)로 열어 주세요.");
-  $("pinInput").disabled = true;
-  $("loginBtn").disabled = true;
-  throw new Error("no key");
-}
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, sendPasswordResetEmail,
+  EmailAuthProvider, reauthenticateWithCredential, updatePassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, collection, onSnapshot, updateDoc, setDoc, addDoc, deleteDoc, writeBatch, query, orderBy, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const studentRef = doc(db, "rooms", ROOM_KEY, "students", STUDENT_ID);
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const SHORT = ["월", "화", "수", "목", "금"];
 
-let data = null;
-const todayIdx = (new Date().getDay() + 6) % 7;
-let sel = todayIdx <= 4 ? todayIdx : 0;
-let pop = null;
-let unsub = null;
-
-// ── 비밀번호 (폰마다 처음 한 번) ──
-async function enter() {
-  $("loginView").classList.add("hidden");
-  $("mainView").classList.remove("hidden");
-  $("status").innerHTML = '<span style="color: var(--muted)">연결하는 중…</span>';
-  try {
-    await signInAnonymously(auth);
-    start();
-  } catch (e) {
-    $("status").innerHTML = '<span style="color:#FF8A80">연결하지 못했어요. Firebase에서 \'익명\' 로그인이 켜져 있는지 확인해 주세요.</span>';
-  }
+function say(id, text, ok = false) { const el = $(id); el.textContent = text; el.className = "msg " + (ok ? "ok" : "err"); }
+function authMsg(e) {
+  const c = e?.code || "";
+  if (c.includes("invalid-credential") || c.includes("wrong-password")) return "이메일 또는 비밀번호가 맞지 않아요";
+  if (c.includes("user-not-found")) return "가입되지 않은 이메일이에요";
+  if (c.includes("too-many-requests")) return "잠시 후 다시 해 주세요";
+  if (c.includes("weak-password")) return "비밀번호는 6자 이상으로 정해 주세요";
+  if (c.includes("network")) return "인터넷 연결을 확인해 주세요";
+  if (c.includes("permission")) return "권한이 없어요";
+  return e?.message || "문제가 생겼어요";
 }
-$("loginBtn").onclick = () => {
-  if ($("pinInput").value === PIN) { store.set("hani-ok", "1"); $("pinInput").value = ""; enter(); }
-  else { $("loginMsg").textContent = "비밀번호가 달라요"; $("pinInput").value = ""; }
-};
-$("pinInput").addEventListener("keydown", (e) => { if (e.key === "Enter") $("loginBtn").click(); });
-$("logoutBtn").onclick = () => { store.del("hani-ok"); if (unsub) unsub(); unsub = null; showLogin(""); };
-
-if (store.get("hani-ok") === "1") enter(); else showLogin("");
-
-// ── 실시간 반영 ──
-function start() {
-  if (unsub) unsub();
-  unsub = onSnapshot(studentRef, { includeMetadataChanges: true }, (snap) => {
-    data = snap.exists() ? snap.data() : null;
-    if (!data || data.week !== mondayStr()) { ensureWeek(); }
-    $("status").innerHTML = snap.metadata.hasPendingWrites
-      ? '<span style="color: var(--muted)">보내는 중…</span>'
-      : '<span style="color: var(--green)">● 저장됨 · 워치는 앱이 켜져 있으면 몇 초 안에 받아요</span>';
-    render();
-  }, () => { $("status").innerHTML = '<span style="color:#FF8A80">기록을 불러오지 못했어요 (보안 규칙 확인)</span>'; });
+function mondayStr(offsetWeeks = 0) {
+  const d = new Date(); const day = (d.getDay() + 6) % 7;
+  d.setDate(d.getDate() - day - offsetWeeks * 7);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
-
-// 새 주가 되면 비우고 지난 주 개수 남기기
-function rolled(cur) {
-  const mon = mondayStr();
-  if (cur && cur.week === mon) return { ...cur };
-  const last = cur && cur.week === mondayStr(1) ? [0, 1, 2, 3, 4].reduce((s, d) => s + countDay(d, cur["d" + d]), 0) : 0;
-  return { week: mon, lastWeek: last, d0: "", d1: "", d2: "", d3: "", d4: "" };
+async function sha256Hex(text) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
 }
-let ensuring = false;
-async function ensureWeek() {
-  if (ensuring) return; ensuring = true;
-  try {
-    await runTransaction(db, async (tx) => {
-      const s = await tx.get(studentRef);
-      const cur = s.exists() ? s.data() : null;
-      if (cur && cur.week === mondayStr()) return;
-      tx.set(studentRef, { ...rolled(cur), updatedBy: "teacher", updatedAt: serverTimestamp() });
-    });
-  } finally { ensuring = false; }
-}
+function newSalt() { return [...crypto.getRandomValues(new Uint8Array(12))].map(b => b.toString(16).padStart(2, "0")).join(""); }
 
-async function setBit(d, i, val) {
-  await runTransaction(db, async (tx) => {
-    const s = await tx.get(studentRef);
-    const cur = rolled(s.exists() ? s.data() : null);
-    const arr = decode(cur["d" + d], PERIODS[d]);
-    arr[i] = val;
-    cur["d" + d] = encode(arr);
-    tx.set(studentRef, { ...cur, updatedBy: "teacher", updatedAt: serverTimestamp() });
-  });
-}
-
-// ── 화면 그리기 ──
-const THUMB = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="10" width="4.5" height="11" rx="1" fill="currentColor"></rect><path d="M8.5 21V10.5L12.6 3.2c.3-.5.8-.7 1.3-.6 1.2.3 1.9 1.5 1.6 2.7L14.6 9H20a2 2 0 0 1 2 2.3l-1.3 7.5A2.6 2.6 0 0 1 18.1 21H8.5z" fill="currentColor"></path></svg>';
-
-function render() {
-  const cur = rolled(data);
-  const total = [0, 1, 2, 3, 4].reduce((s, d) => s + countDay(d, cur["d" + d]), 0);
-  $("total").textContent = total;
-  $("lastWeek").textContent = `지난 주 ${cur.lastWeek || 0}개 · 월요일마다 새로 시작`;
-
-  const tabs = $("tabs");
-  tabs.innerHTML = "";
+// 학생 달성률 (앱과 같은 계산)
+function weekStats(st, wantWeek) {
+  const periods = Array.isArray(st.periods) && st.periods.length === 5 ? st.periods : [6, 7, 6, 7, 6];
+  const leave = Array.isArray(st.leave) && st.leave.length === 5 ? st.leave : [0, 0, 0, 0, 0];
+  const lv = d => (leave[d] >= 2 && leave[d] <= periods[d]) ? leave[d] : 0;
+  const avail = d => lv(d) ? lv(d) - 1 : periods[d];
+  const same = st.week === wantWeek;
+  let got = 0, tot = 0;
   for (let d = 0; d < 5; d++) {
-    const b = document.createElement("button");
-    b.className = "tab" + (d === sel ? " sel" : "") + (d === todayIdx ? " today" : "");
-    b.innerHTML = `<span class="t">오늘</span><span class="d">${SHORT[d]}</span><span class="c"><b>${countDay(d, cur["d" + d])}</b>/${avail(d)}</span>`;
-    b.setAttribute("aria-label", `${FULL[d]} 도장 ${countDay(d, cur["d" + d])}개`);
-    b.onclick = () => { sel = d; pop = null; render(); };
-    tabs.append(b);
+    tot += avail(d);
+    if (!same) continue;
+    const bits = (st.days || [])[d] || "";
+    for (let i = 0; i < periods[d]; i++) if (bits[i] && bits[i] !== "0" && !(lv(d) && i + 1 >= lv(d))) got++;
   }
-
-  $("dayhead").innerHTML = `${FULL[sel]} <b>${countDay(sel, cur["d" + sel])}</b>개`;
-  const grid = $("grid");
-  grid.className = "grid" + (PERIODS[sel] > 6 ? " seven" : "");
-  grid.innerHTML = "";
-  const arr = decode(cur["d" + sel], PERIODS[sel]);
-  for (let i = 0; i < PERIODS[sel]; i++) {
-    const n = i + 1;
-    const off = isOff(sel, n);
-    const on = arr[i] && !off;
-    const b = document.createElement("button");
-    b.className = "slot" + (off ? " off" : on ? " on" : "");
-    if (off) {
-      b.disabled = true;
-      b.innerHTML = `<span class="n">${n}</span><span class="l">조퇴</span>`;
-      b.setAttribute("aria-label", `${n}교시 조퇴`);
-    } else if (on) {
-      const isPop = pop && pop[0] === sel && pop[1] === i;
-      b.innerHTML = `<span class="seal${isPop ? " pop" : ""}">${THUMB}<span>${n}교시</span></span>`;
-      b.setAttribute("aria-label", `${n}교시 도장 있음, 눌러서 지우기`);
-      b.onclick = async () => {
-        if (!confirm(`${FULL[sel]} ${n}교시 도장을 지울까요?`)) return;
-        pop = null;
-        await setBit(sel, i, false);
-      };
-    } else {
-      b.innerHTML = `<span class="n">${n}</span><span class="l">교시</span>`;
-      b.setAttribute("aria-label", `${n}교시 빈칸, 눌러서 도장 찍기`);
-      b.onclick = async () => {
-        const d = sel;
-        pop = [d, i];
-        if (navigator.vibrate) navigator.vibrate(40);
-        await setBit(d, i, true);
-        toast(`${FULL[d]} ${n}교시 도장을 찍었어요`, () => setBit(d, i, false));
-      };
-    }
-    grid.append(b);
-  }
+  return { pct: tot ? Math.round(got * 100 / tot) : 0, same };
+}
+function lastWeekPct(st) {
+  const pm = mondayStr(1);
+  const h = (st.hist || []).find(x => x.w === pm);
+  if (h) return h.p;
+  const s = weekStats(st, pm);
+  return s.same ? s.pct : null;
 }
 
-let toastTimer = null;
-function toast(text, undo) {
-  $("toastText").textContent = text;
-  $("toast").classList.add("show");
-  $("undoBtn").onclick = async () => { $("toast").classList.remove("show"); pop = null; await undo(); };
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => $("toast").classList.remove("show"), 5000);
+// ───────── 로그인 ─────────
+$("btnLogin").onclick = async () => {
+  say("loginMsg", "");
+  try { await signInWithEmailAndPassword(auth, $("email").value.trim(), $("pw").value); }
+  catch (e) { say("loginMsg", authMsg(e)); }
+};
+$("pw").addEventListener("keydown", e => { if (e.key === "Enter") $("btnLogin").click(); });
+$("btnForgot").onclick = async () => {
+  const em = $("email").value.trim();
+  if (!em) return say("loginMsg", "이메일을 먼저 적어 주세요");
+  try { await sendPasswordResetEmail(auth, em); say("loginMsg", "재설정 메일을 보냈어요. 메일함을 확인해 주세요", true); }
+  catch (e) { say("loginMsg", authMsg(e)); }
+};
+$("btnLogout").onclick = () => signOut(auth);
+
+let unsubs = [], cid = null, cls = null, students = [], devices = [];
+function stopAll() { unsubs.forEach(u => u()); unsubs = []; }
+
+onAuthStateChanged(auth, user => {
+  stopAll();
+  if (!user || user.isAnonymous) { $("login").classList.remove("hidden"); $("app").classList.add("hidden"); return; }
+  $("login").classList.add("hidden"); $("app").classList.remove("hidden");
+  $("hdrEmail").textContent = user.email || "";
+  unsubs.push(onSnapshot(doc(db, "teachers", user.uid), snap => {
+    const id = snap.data()?.classId;
+    if (!id) { $("hdrClass").textContent = "아직 반이 없어요 · 선생님 앱에서 반을 먼저 만들어 주세요"; return; }
+    if (id === cid) return;
+    cid = id;
+    unsubs.push(onSnapshot(doc(db, "classes", cid), s => { cls = s.data(); $("hdrClass").textContent = cls?.name || "우리 반"; $("className").value = cls?.name || ""; }));
+    unsubs.push(onSnapshot(query(collection(db, "classes", cid, "students"), orderBy("order")), s => { students = s.docs.map(d => ({ id: d.id, ...d.data() })); renderStudents(); renderDevices(); }));
+    unsubs.push(onSnapshot(collection(db, "classes", cid, "devices"), s => { devices = s.docs.map(d => ({ id: d.id, ...d.data() })); renderDevices(); renderStudents(); }));
+  }));
+});
+
+// ───────── 도장 비밀번호 ─────────
+$("btnPin").onclick = async () => {
+  const a = $("pin1").value, b = $("pin2").value;
+  if (!/^\d{4}$/.test(a)) return say("pinMsg", "숫자 4자리를 넣어 주세요");
+  if (a !== b) return say("pinMsg", "서로 달라요");
+  try { const salt = newSalt(); await updateDoc(doc(db, "classes", cid), { pinHash: await sha256Hex(`${salt}:${a}`), pinSalt: salt });
+    $("pin1").value = $("pin2").value = ""; say("pinMsg", "도장 비밀번호를 바꿨어요", true); }
+  catch (e) { say("pinMsg", authMsg(e)); }
+};
+
+// ───────── 계정 비밀번호 ─────────
+$("btnPw").onclick = async () => {
+  const u = auth.currentUser, o = $("oldPw").value, n1 = $("newPw1").value, n2 = $("newPw2").value;
+  if (n1.length < 6) return say("pwMsg", "새 비밀번호는 6자 이상이에요");
+  if (n1 !== n2) return say("pwMsg", "새 비밀번호가 서로 달라요");
+  try { await reauthenticateWithCredential(u, EmailAuthProvider.credential(u.email, o)); await updatePassword(u, n1);
+    ["oldPw", "newPw1", "newPw2"].forEach(id => $(id).value = ""); say("pwMsg", "계정 비밀번호를 바꿨어요", true); }
+  catch (e) { say("pwMsg", authMsg(e)); }
+};
+$("btnReset").onclick = async () => {
+  try { await sendPasswordResetEmail(auth, auth.currentUser.email); say("pwMsg", "재설정 메일을 보냈어요", true); }
+  catch (e) { say("pwMsg", authMsg(e)); }
+};
+
+// ───────── 반 이름 ─────────
+$("btnClassName").onclick = async () => {
+  const n = $("className").value.trim(); if (!n) return;
+  try { await updateDoc(doc(db, "classes", cid), { name: n }); say("classMsg", "저장했어요", true); } catch (e) { say("classMsg", authMsg(e)); }
+};
+
+// ───────── 연결 코드 ─────────
+async function makeCode(type, sid) {
+  for (let k = 0; k < 6; k++) {
+    const code = String(100000 + Math.floor(Math.random() * 900000));
+    try {
+      await setDoc(doc(db, "joinCodes", code), { classId: cid, type, studentId: sid, owner: auth.currentUser.uid, expiresAt: Date.now() + 30 * 60 * 1000 });
+      return code;
+    } catch (e) { /* 다른 코드로 다시 */ }
+  }
+  throw new Error("코드를 만들지 못했어요");
+}
+function showDialog(html) { $("dlgBody").innerHTML = html; $("dlg").showModal(); }
+$("dlgClose").onclick = () => $("dlg").close();
+$("btnTabletCode").onclick = async () => {
+  try { const c = await makeCode("tablet", ""); showDialog(`<h2>🖥 학급게시 태블릿 연결 코드</h2><div class="code">${c}</div><p class="note">태블릿 앱을 처음 열면 나오는 칸에 넣어 주세요. 30분 동안 쓸 수 있고, 넣으면 아래 '기기 연결'에 승인 대기로 들어와요.</p>`); }
+  catch (e) { alert(authMsg(e)); }
+};
+
+// ───────── 기기 ─────────
+function renderDevices() {
+  const name = id => students.find(s => s.id === id)?.name || (id ? "(삭제된 학생)" : "반 전체");
+  const label = t => ({ watch: "⌚ 워치", phone: "📱 학생폰", tablet: "🖥 태블릿" }[t] || t);
+  const rows = [...devices].sort((a, b) => (a.status === "ok") - (b.status === "ok"));
+  $("devBody").innerHTML = rows.length ? rows.map(d => `<tr>
+      <td>${label(d.type)} <small style="color:#999">${esc(d.model)}</small></td><td>${esc(name(d.studentId))}</td><td>${esc(d.code)}</td>
+      <td>${d.status === "ok" ? '<span class="badge">연결됨</span>' : '<span class="badge w">승인 대기</span>'}</td>
+      <td style="text-align:right">${d.status === "ok" ? `<button class="sm danger" data-unlink="${d.id}">해지</button>`
+        : `<button class="sm p" data-approve="${d.id}">승인</button> <button class="sm ghost" data-unlink="${d.id}">거절</button>`}</td></tr>`).join("")
+    : `<tr><td colspan="5" style="color:#999">연결된 기기가 없어요</td></tr>`;
+}
+$("devBody").onclick = async e => {
+  const a = e.target.dataset.approve, u = e.target.dataset.unlink;
+  try {
+    if (a) await updateDoc(doc(db, "classes", cid, "devices", a), { status: "ok" });
+    if (u && confirm("이 기기 연결을 끊을까요?")) await deleteDoc(doc(db, "classes", cid, "devices", u));
+  } catch (err) { alert(authMsg(err)); }
+};
+
+// ───────── 학생 ─────────
+function renderStudents() {
+  $("stCount").textContent = `${students.length}명`;
+  const mon = mondayStr();
+  $("stBody").innerHTML = students.length ? students.map(st => {
+    const w = weekStats(st, mon), lw = lastWeekPct(st);
+    const periods = Array.isArray(st.periods) ? st.periods : [6, 7, 6, 7, 6];
+    const leave = Array.isArray(st.leave) ? st.leave : [0, 0, 0, 0, 0];
+    const tt = periods.map((p, d) => `${SHORT[d]}${p}${leave[d] >= 2 && leave[d] <= p ? `(${leave[d]}~조퇴)` : ""}`).join(" ");
+    const nDev = devices.filter(d => d.studentId === st.id && d.status === "ok").length;
+    return `<tr><td><b>${esc(st.name)}</b><br><small style="color:#999">기기 ${nDev}대</small></td>
+      <td><span class="bar"><i style="width:${w.pct}%"></i></span>${w.pct}%</td><td>${lw == null ? "–" : lw + "%"}</td>
+      <td style="font-size:13px">${tt}</td>
+      <td style="text-align:right;white-space:nowrap"><button class="sm ghost" data-code="${st.id}">기기 코드</button>
+        <button class="sm ghost" data-tt="${st.id}">시간표</button> <button class="sm ghost" data-rename="${st.id}">이름</button>
+        <button class="sm danger" data-del="${st.id}">삭제</button></td></tr>`;
+  }).join("") : `<tr><td colspan="5" style="color:#999">아직 학생이 없어요</td></tr>`;
+}
+$("btnAdd").onclick = async () => {
+  const n = $("newName").value.trim(); if (!n) return;
+  try {
+    await addDoc(collection(db, "classes", cid, "students"), { name: n, order: Date.now(), periods: [6, 7, 6, 7, 6], leave: [0, 0, 0, 0, 0], week: "", days: ["", "", "", "", ""], hist: [], createdAt: serverTimestamp() });
+    $("newName").value = "";
+  } catch (e) { alert(authMsg(e)); }
+};
+$("newName").addEventListener("keydown", e => { if (e.key === "Enter") $("btnAdd").click(); });
+$("stBody").onclick = async e => {
+  const t = e.target.dataset; const st = students.find(s => s.id === (t.code || t.tt || t.rename || t.del)); if (!st) return;
+  try {
+    if (t.code) {
+      const c = await makeCode("student", st.id);
+      showDialog(`<h2>⌚ ${esc(st.name)} 워치·학생폰 연결 코드</h2><div class="code">${c}</div><p class="note">워치 앱이나 학생폰 앱을 처음 열면 나오는 칸에 넣어 주세요. 30분 동안 쓸 수 있어요.</p>`);
+    }
+    if (t.rename) { const n = prompt("새 이름 또는 별명", st.name); if (n && n.trim()) await updateDoc(doc(db, "classes", cid, "students", st.id), { name: n.trim().slice(0, 12) }); }
+    if (t.del && confirm(`${st.name} 학생과 도장 기록, 연결된 기기를 모두 지울까요? 되돌릴 수 없어요.`)) {
+      const b = writeBatch(db);
+      devices.filter(d => d.studentId === st.id).forEach(d => b.delete(doc(db, "classes", cid, "devices", d.id)));
+      b.delete(doc(db, "classes", cid, "students", st.id));
+      await b.commit();
+    }
+    if (t.tt) openTimetable(st);
+  } catch (err) { alert(authMsg(err)); }
+};
+function openTimetable(st) {
+  const periods = Array.isArray(st.periods) ? st.periods : [6, 7, 6, 7, 6];
+  const leave = Array.isArray(st.leave) ? st.leave : [0, 0, 0, 0, 0];
+  showDialog(`<h2>🗓 ${esc(st.name)} 시간표</h2><p class="note">요일별 교시 수와, 몇 교시부터 조퇴인지 정해요.</p>
+    <div class="tt">${SHORT.map((d, i) => `<div><b>${d}</b>
+      <select id="tp${i}">${[1,2,3,4,5,6,7,8,9].map(n => `<option ${n === periods[i] ? "selected" : ""}>${n}</option>`).join("")}</select>
+      <select id="tl${i}"><option value="0">조퇴 없음</option>${[2,3,4,5,6,7,8,9].map(n => `<option value="${n}" ${n === leave[i] ? "selected" : ""}>${n}교시~</option>`).join("")}</select></div>`).join("")}</div>
+    <button class="p" id="ttSave">저장</button>`);
+  $("ttSave").onclick = async () => {
+    const p = SHORT.map((_, i) => +$("tp" + i).value);
+    const l = SHORT.map((_, i) => { const v = +$("tl" + i).value; return v >= 2 && v <= p[i] ? v : 0; });
+    try { await updateDoc(doc(db, "classes", cid, "students", st.id), { periods: p, leave: l }); $("dlg").close(); } catch (e) { alert(authMsg(e)); }
+  };
 }
 </script>
 </body>
