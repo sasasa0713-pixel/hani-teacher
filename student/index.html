@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>참 잘했어요! 내 도장판</title>
+<meta name="theme-color" content="#FF5A4E">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="내 도장판">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-180.png">
+<style>
+:root{--a:#FF5A4E;--y:#FFD24A;--m:#8e8e93;--bg:#f4f4f6;--card:#fff;--line:#e6e6ea;--g:#1f9d55;--err:#d93025}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Pretendard","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;background:var(--bg);color:#111;min-height:100vh;max-width:520px;margin:0 auto;box-shadow:0 0 0 1px #0000000a;padding-bottom:env(safe-area-inset-bottom)}
+header{background:#000;color:#fff;padding:calc(12px + env(safe-area-inset-top)) 16px 12px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:5}
+.stamp{display:inline-block;color:var(--a);border:3px solid var(--a);border-radius:12px;padding:0 10px;font-size:18px;font-weight:900;transform:rotate(-4deg);box-shadow:inset 0 0 0 2px #000,inset 0 0 0 4px var(--a);white-space:nowrap}
+header .t{font-size:14px;color:#ccc;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}header .sp{flex:1}
+header button{background:#2c2c2e;color:#fff;height:34px;padding:0 12px;font-size:13px;border:none;border-radius:10px;font-weight:700}
+main{padding:14px 14px 30px;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--card);border-radius:18px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+h2{font-size:18px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+h2 small{font-size:13px;color:var(--m);font-weight:400}
+p.note{font-size:13px;color:var(--m);line-height:1.6}
+input{height:52px;width:100%;border:1px solid var(--line);border-radius:14px;padding:0 14px;font-size:22px;font-family:inherit;background:#fff;text-align:center;letter-spacing:8px;font-weight:800}
+input:focus{outline:2px solid var(--a);border-color:transparent}
+button{height:48px;border:none;border-radius:14px;padding:0 16px;font-size:16px;font-weight:700;font-family:inherit;cursor:pointer;background:#eee;color:#111}
+button.p{background:var(--a);color:#fff}button.sm{height:34px;padding:0 12px;font-size:13px;border-radius:10px}
+button.ghost{background:#fff;border:1px solid var(--line)}
+button:disabled{opacity:.5;cursor:default}
+.msg{font-size:14px;min-height:20px;margin-top:8px;text-align:center}.msg.err{color:var(--err)}.msg.ok{color:var(--g)}
+.wrap{max-width:460px;margin:0 auto;padding:0 16px;width:100%}
+#gate,#wait{margin-top:48px}
+#gate .stamp,#wait .stamp{display:block;width:max-content;margin:0 auto 18px}
+#gate h1{font-size:22px;text-align:center;margin-bottom:6px}
+.big{font-size:64px;text-align:center;margin:18px 0}
+.code{font-size:34px;font-weight:900;letter-spacing:6px;color:#b17f00;background:#fffbea;border-radius:14px;text-align:center;padding:12px;margin:10px 0}
+/* 도장판 */
+.pct-wrap{text-align:center;padding:6px 0 2px}
+.pct-big{font-size:46px;font-weight:900;color:var(--a);line-height:1}
+.pct-sub{font-size:14px;color:var(--m);margin-top:4px}
+.ring{position:relative;width:132px;height:132px;margin:4px auto 2px}
+.ring svg{transform:rotate(-90deg)}
+.ring .ct{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .ct b{font-size:34px;font-weight:900;color:var(--a);line-height:1}
+.ring .ct span{font-size:12px;color:var(--m);margin-top:2px}
+.daywrap{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.dayrow{display:flex;align-items:center;gap:8px}
+.dayrow .dl{width:30px;font-weight:800;font-size:16px;flex:none;text-align:center}
+.dayrow.today .dl{color:var(--a)}
+.slots{display:flex;gap:7px;flex-wrap:wrap;flex:1}
+.slot{width:46px;height:46px;border-radius:50%;border:2px dashed #cfcfd4;background:#fafafa;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;color:#aaa;font-size:15px;flex:none}
+.slot .pn{font-size:9px;color:#bbb;font-weight:600}
+.slot.on{border-style:solid;background:#fff;box-shadow:inset 0 0 0 2px #fff,inset 0 0 0 4px currentColor}
+.slot.off{border:none;background:repeating-linear-gradient(-45deg,#eee 0 5px,#e2e2e6 5px 9px);color:#aaa}
+.who{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.whochip{display:inline-flex;align-items:center;gap:5px;border:1.5px solid currentColor;border-radius:50px;padding:3px 10px;font-size:13px;font-weight:700}
+.histrow{display:flex;justify-content:space-between;font-size:14px;padding:7px 2px;border-top:1px solid var(--line)}
+.histrow b{color:var(--a)}
+.hidden{display:none!important}
+dialog{border:none;border-radius:18px;padding:22px;max-width:460px;width:92%}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog h2{font-size:19px}
+.step{display:flex;gap:10px;align-items:flex-start;margin:12px 0;font-size:15px;line-height:1.5}
+.step .n{flex:none;width:26px;height:26px;border-radius:50%;background:var(--a);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:14px}
+.share{display:inline-block;vertical-align:-3px}
+.addbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;background:#111;color:#fff;display:flex;align-items:center;gap:10px;padding:12px 14px calc(12px + env(safe-area-inset-bottom));z-index:8}
+.addbar span{flex:1;font-size:14px}
+.addbar button{height:38px;background:var(--a);color:#fff;font-size:14px}
+.addbar .x{background:#333;color:#aaa;width:38px;padding:0}
+</style>
+</head>
+<body>
+
+<!-- 1. 연결 코드 입력 -->
+<section id="gate" class="wrap hidden">
+  <span class="stamp">참 잘했어요!</span>
+  <h1>내 도장판 보기</h1>
+  <p class="note" style="text-align:center;margin-bottom:16px">선생님께 받은 <b>연결 코드 6자리</b>를 넣어 주세요.</p>
+  <div class="card">
+    <input id="code" inputmode="numeric" maxlength="6" placeholder="------" autocomplete="one-time-code">
+    <button class="p" id="btnJoin" style="width:100%;margin-top:12px">연결하기</button>
+    <div class="msg" id="gateMsg"></div>
+  </div>
+  <p class="note" style="text-align:center;margin-top:14px">코드는 선생님 앱·웹의 <b>학생 › 연결 코드 만들기</b>에서 받을 수 있어요.</p>
+</section>
+
+<!-- 2. 승인 대기 -->
+<section id="wait" class="wrap hidden">
+  <span class="stamp">참 잘했어요!</span>
+  <div class="big">🙌</div>
+  <h1 style="text-align:center;font-size:20px;margin-bottom:6px">선생님 승인을 기다리고 있어요</h1>
+  <p class="note" style="text-align:center">선생님이 <b>승인</b>하면 바로 도장판이 열려요.<br>이 화면은 켜 둔 채로 잠깐만 기다려 주세요.</p>
+  <div class="card" style="margin-top:16px;text-align:center">
+    <p class="note">내가 넣은 코드</p>
+    <div class="code" id="waitCode">------</div>
+    <button class="ghost" id="btnReenter" style="width:100%">다른 코드로 다시 연결</button>
+  </div>
+</section>
+
+<!-- 3. 도장판 -->
+<div id="board" class="hidden">
+  <header>
+    <span class="stamp">참 잘했어요!</span>
+    <span class="t" id="hdrName">내 도장판</span>
+    <span class="sp"></span>
+    <button id="btnAdd2">📲 바로가기</button>
+  </header>
+  <main>
+    <div class="card">
+      <div class="ring" id="ring"></div>
+      <div class="pct-sub" style="text-align:center">이번 주 달성률</div>
+      <div class="daywrap" id="grid" style="margin-top:14px"></div>
+      <div class="who" id="who"></div>
+    </div>
+    <div class="card" id="histCard">
+      <h2>📈 지난 기록 <small>주별 달성률</small></h2>
+      <div id="hist"></div>
+    </div>
+  </main>
+</div>
+
+<!-- 홈 화면 추가 안내 -->
+<dialog id="addDlg">
+  <h2>📲 홈 화면에 추가하기</h2>
+  <p class="note" style="margin:6px 0 4px">앱처럼 아이콘을 만들어 두면 다음부턴 바로 열 수 있어요.</p>
+  <div id="iosHelp">
+    <div class="step"><span class="n">1</span><div>화면 아래(또는 위)의 <b>공유 버튼</b> <svg class="share" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#007aff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M12 4l-4 4M12 4l4 4M6 12H5a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5a2 2 0 0 0-2-2h-1"/></svg> 을 눌러요.</div></div>
+    <div class="step"><span class="n">2</span><div>메뉴를 내려서 <b>“홈 화면에 추가”</b>를 눌러요.</div></div>
+    <div class="step"><span class="n">3</span><div><b>“추가”</b>를 누르면 끝! 홈 화면에 아이콘이 생겨요.</div></div>
+  </div>
+  <div id="aosHelp" class="hidden">
+    <div class="step"><span class="n">1</span><div>오른쪽 위 <b>⋮</b> 메뉴를 눌러요.</div></div>
+    <div class="step"><span class="n">2</span><div><b>“홈 화면에 추가”</b> 또는 <b>“앱 설치”</b>를 눌러요.</div></div>
+    <div class="step"><span class="n">3</span><div><b>“추가”</b>를 누르면 끝이에요.</div></div>
+  </div>
+  <button class="p" id="addDlgClose" style="width:100%;margin-top:14px">알겠어요</button>
+</dialog>
+
+<!-- 안드로이드 설치 배너 -->
+<div class="addbar hidden" id="installBar">
+  <span>홈 화면에 바로가기를 추가할까요?</span>
+  <button id="btnInstall">추가</button>
+  <button class="x" id="btnInstallX">✕</button>
+</div>
+
+<script type="module">
+// ───── Firebase 설정 (교사 페이지와 같은 프로젝트) ─────
+const firebaseConfig = {
+  apiKey: "AIzaSyC0rbFrct_9AgaVffxxcqitqJCJufRS9_Q",
+  authDomain: "hani-praise.firebaseapp.com",
+  projectId: "hani-praise",
+};
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const SHORT = ["월", "화", "수", "목", "금"];
+const STAMP_COLORS = [0xFFFF5A4E, 0xFFFF9F43, 0xFFF6C343, 0xFF34C759, 0xFF5AA9FF, 0xFF3D7BFF, 0xFFAF52DE, 0xFFFF6FA8];
+const hex = c => "#" + (c & 0xFFFFFF).toString(16).padStart(6, "0");
+function iconSvg(key, size = 22) {
+  const p = {
+    thumb: '<rect x="2" y="10" width="4.5" height="11" rx="1"/><path d="M8.5 21V10.5L12.6 3.2c.3-.5.8-.7 1.3-.6 1.2.3 1.9 1.5 1.6 2.7L14.6 9H20a2 2 0 0 1 2 2.3l-1.3 7.5A2.6 2.6 0 0 1 18.1 21H8.5z"/>',
+    heart: '<path d="M12 21.2C11.6 21 3.4 16.2 2.2 10.3 1.4 6.4 4 3.4 7.2 3.4c2 0 3.6 1 4.8 2.7 1.2-1.7 2.8-2.7 4.8-2.7 3.2 0 5.8 3 5 6.9C20.6 16.2 12.4 21 12 21.2z"/>',
+    star: '<path d="M12 2.3l2.9 6.1 6.7.8-4.9 4.6 1.3 6.6L12 17.1l-6 3.3 1.3-6.6-4.9-4.6 6.7-.8z"/>',
+    flower: '<circle cx="12" cy="6" r="4.6"/><circle cx="17.7" cy="10.1" r="4.6"/><circle cx="15.5" cy="16.9" r="4.6"/><circle cx="8.5" cy="16.9" r="4.6"/><circle cx="6.3" cy="10.1" r="4.6"/><circle cx="12" cy="12" r="3" fill="#fff"/>',
+    check: '<path d="M4.5 12.5l5 5L19.5 7" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>',
+    smile: '<circle cx="12" cy="12" r="10"/><circle cx="8.6" cy="9.8" r="1.5" fill="#000" opacity=".7"/><circle cx="15.4" cy="9.8" r="1.5" fill="#000" opacity=".7"/><path d="M7.5 13.5a5 5 0 0 0 9 0" fill="none" stroke="#000" stroke-opacity=".7" stroke-width="1.9" stroke-linecap="round"/>',
+  }[key] || '';
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor">${p}</svg>`;
+}
+function say(id, text, ok = false) { const el = $(id); el.textContent = text; el.className = "msg " + (ok ? "ok" : "err"); }
+function mondayStr(offsetWeeks = 0) {
+  const d = new Date(); const day = (d.getDay() + 6) % 7;
+  d.setDate(d.getDate() - day - offsetWeeks * 7);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+function getPL(st) {
+  const periods = Array.isArray(st.periods) && st.periods.length === 5 ? st.periods : [6, 7, 6, 7, 6];
+  const leave = Array.isArray(st.leave) && st.leave.length === 5 ? st.leave : [0, 0, 0, 0, 0];
+  const lv = d => (leave[d] >= 2 && leave[d] <= periods[d]) ? leave[d] : 0;
+  const avail = d => lv(d) ? lv(d) - 1 : periods[d];
+  const isOff = (d, p) => lv(d) && p >= lv(d);
+  return { periods, lv, avail, isOff };
+}
+function weekStats(st, wantWeek) {
+  const { periods, lv, avail } = getPL(st);
+  const same = st.week === wantWeek;
+  let got = 0, tot = 0;
+  for (let d = 0; d < 5; d++) {
+    tot += avail(d);
+    if (!same) continue;
+    const bits = (st.days || [])[d] || "";
+    for (let i = 0; i < periods[d]; i++) if (bits[i] && bits[i] !== "0" && !(lv(d) && i + 1 >= lv(d))) got++;
+  }
+  return { pct: tot ? Math.round(got * 100 / tot) : 0, same };
+}
+
+// ───── 상태 ─────
+const LS = "goodjob_student";
+let reg = null;      // {cid, sid, code}
+let devSub = null, stuSub = null, clsSub = null;
+let cls = null, uid = null;
+try { reg = JSON.parse(localStorage.getItem(LS) || "null"); } catch (e) {}
+
+function show(sec) { ["gate", "wait", "board"].forEach(s => $(s).classList.toggle("hidden", s !== sec)); }
+function stopBoard() { [devSub, stuSub, clsSub].forEach(u => u && u()); devSub = stuSub = clsSub = null; }
+
+// ───── 로그인(익명) ─────
+onAuthStateChanged(auth, async user => {
+  if (!user) { try { await signInAnonymously(auth); } catch (e) { show("gate"); say("gateMsg", "연결에 문제가 생겼어요. 잠시 후 다시 해 주세요."); } return; }
+  uid = user.uid;
+  if (reg && reg.cid) watchDevice();
+  else show("gate");
+});
+
+// ───── 연결 코드 입력 ─────
+$("btnJoin").onclick = joinWithCode;
+$("code").addEventListener("keydown", e => { if (e.key === "Enter") joinWithCode(); });
+async function joinWithCode() {
+  const code = $("code").value.trim();
+  if (!/^\d{6}$/.test(code)) return say("gateMsg", "숫자 6자리를 넣어 주세요");
+  if (!uid) return say("gateMsg", "잠시만요, 다시 눌러 주세요");
+  $("btnJoin").disabled = true; say("gateMsg", "연결하는 중…", true);
+  try {
+    const snap = await getDoc(doc(db, "joinCodes", code));
+    if (!snap.exists()) { say("gateMsg", "코드가 맞지 않아요. 다시 확인해 주세요"); return; }
+    const jc = snap.data();
+    if (jc.type === "tablet" || !jc.studentId) { say("gateMsg", "학생용 코드가 아니에요"); return; }
+    if ((jc.expiresAt || 0) < Date.now()) { say("gateMsg", "코드 시간이 지났어요. 선생님께 새 코드를 받아 주세요"); return; }
+    const cid = jc.classId, sid = jc.studentId;
+    await setDoc(doc(db, "classes", cid, "devices", uid), {
+      status: "pending", type: "phone", studentId: sid, code, createdAt: Date.now(),
+    });
+    reg = { cid, sid, code };
+    try { localStorage.setItem(LS, JSON.stringify(reg)); } catch (e) {}
+    watchDevice();
+  } catch (e) {
+    say("gateMsg", "연결에 실패했어요. 잠시 후 다시 해 주세요");
+  } finally { $("btnJoin").disabled = false; }
+}
+
+$("btnReenter").onclick = () => {
+  stopBoard();
+  try { localStorage.removeItem(LS); } catch (e) {}
+  reg = null; $("code").value = ""; say("gateMsg", ""); show("gate");
+};
+
+// ───── 기기 승인 상태 지켜보기 ─────
+function watchDevice() {
+  stopBoard();
+  $("waitCode").textContent = reg.code || "------";
+  show("wait");
+  devSub = onSnapshot(doc(db, "classes", reg.cid, "devices", uid), s => {
+    const d = s.data();
+    if (!d) {            // 선생님이 해지함
+      stopBoard();
+      try { localStorage.removeItem(LS); } catch (e) {}
+      reg = null; say("gateMsg", "선생님이 연결을 끊었어요. 새 코드로 다시 연결해 주세요"); show("gate"); return;
+    }
+    if (d.status === "ok") { if (!stuSub) openBoard(); }
+    else { if (stuSub || clsSub) { stuSub && stuSub(); clsSub && clsSub(); stuSub = clsSub = null; } show("wait"); }
+  }, err => { show("wait"); });
+}
+
+// ───── 내 도장판 (읽기 전용) ─────
+function openBoard() {
+  show("board");
+  clsSub = onSnapshot(doc(db, "classes", reg.cid), s => { cls = s.data() || {}; renderBoard(); }, () => {});
+  stuSub = onSnapshot(doc(db, "classes", reg.cid, "students", reg.sid), s => {
+    if (!s.exists()) { $("hdrName").textContent = "삭제된 학생"; return; }
+    curStu = { id: s.id, ...s.data() };
+    renderBoard();
+  }, () => {});
+}
+
+let curStu = null;
+function lookFor(code) {
+  const st = Object.values(cls?.staff || {}).find(s => s.code === code);
+  return st ? { color: st.color, icon: st.icon, name: st.name } : { color: STAMP_COLORS[0], icon: "thumb", name: "" };
+}
+function ringSvg(pct) {
+  const r = 58, c = 2 * Math.PI * r, off = c * (1 - pct / 100);
+  return `<svg width="132" height="132" viewBox="0 0 132 132">
+    <circle cx="66" cy="66" r="${r}" fill="none" stroke="#eee" stroke-width="12"/>
+    <circle cx="66" cy="66" r="${r}" fill="none" stroke="${hex(STAMP_COLORS[0])}" stroke-width="12" stroke-linecap="round"
+      stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}"/>
+  </svg><div class="ct"><b>${pct}%</b><span>이번 주</span></div>`;
+}
+function renderBoard() {
+  if (!curStu) return;
+  const st = curStu;
+  $("hdrName").textContent = st.name || "내 도장판";
+  const mon = mondayStr(), same = st.week === mon, { periods, lv, isOff } = getPL(st);
+  const today = (new Date().getDay() + 6) % 7;
+  const w = weekStats(st, mon);
+  $("ring").innerHTML = ringSvg(w.pct);
+  $("grid").innerHTML = [0, 1, 2, 3, 4].map(d => {
+    const bits = same ? ((st.days || [])[d] || "") : "";
+    const slots = Array.from({ length: periods[d] }, (_, i) => {
+      if (isOff(d, i + 1)) return `<div class="slot off"><span>${i + 1}</span><span class="pn">조퇴</span></div>`;
+      const m = (bits[i] && bits[i] !== "0") ? bits[i] : "0";
+      if (m !== "0") { const lk = lookFor(m); return `<div class="slot on" style="color:${hex(lk.color)}">${iconSvg(lk.icon, 22)}</div>`; }
+      return `<div class="slot">${i + 1}<span class="pn">교시</span></div>`;
+    }).join("");
+    return `<div class="dayrow ${d === today ? "today" : ""}"><div class="dl">${SHORT[d]}</div><div class="slots">${slots}</div></div>`;
+  }).join("");
+  const staff = Object.values(cls?.staff || {}).filter(s => s.code && s.code !== "1").sort((a, b) => a.code < b.code ? -1 : 1);
+  $("who").innerHTML = staff.length ? `<span class="note" style="margin:0 6px 0 0">도장 주인</span>` + staff.map(s => `<span class="whochip" style="color:${hex(s.color)}">${iconSvg(s.icon, 16)}${esc(s.name)}</span>`).join("") : "";
+  // 지난 기록
+  const hist = [...(st.hist || [])].sort((a, b) => a.w < b.w ? 1 : -1).slice(0, 8);
+  $("histCard").classList.toggle("hidden", hist.length === 0);
+  $("hist").innerHTML = hist.map(h => {
+    const dt = h.w.split("-"); return `<div class="histrow"><span>${+dt[1]}월 ${+dt[2]}일 주</span><b>${h.p}%</b></div>`;
+  }).join("");
+}
+
+// ───── 홈 화면에 추가 ─────
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const standalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+$("iosHelp").classList.toggle("hidden", !isIOS);
+$("aosHelp").classList.toggle("hidden", isIOS);
+function openAddHelp() { $("addDlg").showModal(); }
+$("btnAdd2").onclick = () => { if (deferredPrompt) doInstall(); else openAddHelp(); };
+$("addDlgClose").onclick = () => $("addDlg").close();
+
+let deferredPrompt = null;
+window.addEventListener("beforeinstallprompt", e => {
+  e.preventDefault(); deferredPrompt = e;
+  if (!standalone && localStorage.getItem("gj_hideInstall") !== "1") $("installBar").classList.remove("hidden");
+});
+async function doInstall() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice.catch(() => {});
+  deferredPrompt = null; $("installBar").classList.add("hidden");
+}
+$("btnInstall").onclick = doInstall;
+$("btnInstallX").onclick = () => { $("installBar").classList.add("hidden"); try { localStorage.setItem("gj_hideInstall", "1"); } catch (e) {} };
+// iOS에서 아직 홈 화면에 없고 보드까지 들어왔으면 한 번 안내
+window.addEventListener("appinstalled", () => { $("installBar").classList.add("hidden"); deferredPrompt = null; });
+</script>
+</body>
+</html>
