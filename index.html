@@ -7,30 +7,34 @@
 <style>
 :root{--a:#FF5A4E;--y:#FFD24A;--m:#8e8e93;--bg:#f4f4f6;--card:#fff;--line:#e6e6ea;--g:#1f9d55;--err:#d93025}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:"Pretendard","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;background:var(--bg);color:#111;min-height:100vh}
-header{background:#000;color:#fff;padding:14px 28px;display:flex;align-items:center;gap:16px}
-.stamp{display:inline-block;color:var(--a);border:3px solid var(--a);border-radius:12px;padding:0 12px;font-size:22px;font-weight:900;transform:rotate(-4deg);box-shadow:inset 0 0 0 2px #000,inset 0 0 0 4px var(--a)}
-header .t{font-size:16px;color:#ccc}header .sp{flex:1}
-header button{background:#2c2c2e;color:#fff}
-main{max-width:1080px;margin:24px auto;padding:0 16px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
-@media(max-width:860px){main{grid-template-columns:1fr}}
-.card{background:var(--card);border-radius:18px;padding:20px 22px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-.card.wide{grid-column:1/-1}
+body{font-family:"Pretendard","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;background:var(--bg);color:#111;min-height:100vh;max-width:520px;margin:0 auto;box-shadow:0 0 0 1px #0000000a}
+header{background:#000;color:#fff;padding:12px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:5}
+.stamp{display:inline-block;color:var(--a);border:3px solid var(--a);border-radius:12px;padding:0 10px;font-size:18px;font-weight:900;transform:rotate(-4deg);box-shadow:inset 0 0 0 2px #000,inset 0 0 0 4px var(--a);white-space:nowrap}
+header .t{font-size:14px;color:#ccc;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}header .sp{flex:1}
+header button{background:#2c2c2e;color:#fff;height:34px;padding:0 12px;font-size:13px}
+main{padding:14px 14px 90px;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--card);border-radius:18px;padding:16px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.tabbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;background:#fff;border-top:1px solid var(--line);display:flex;z-index:6}
+.tabbar button{flex:1;height:58px;background:none;border:none;border-radius:0;color:#999;font-size:13px;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.tabbar button.on{color:var(--a)}
+.tabbar .ic{font-size:20px;line-height:1}
 h2{font-size:18px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
 h2 small{font-size:13px;color:var(--m);font-weight:400}
 p.note{font-size:13px;color:var(--m);line-height:1.6;margin-bottom:10px}
-input,select{height:40px;border:1px solid var(--line);border-radius:10px;padding:0 12px;font-size:15px;font-family:inherit;background:#fff}
-input:focus{outline:2px solid var(--a);border-color:transparent}
-button{height:40px;border:none;border-radius:10px;padding:0 16px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;background:#eee;color:#111}
-button.p{background:var(--a);color:#fff}button.sm{height:32px;padding:0 12px;font-size:13px}
+input,select{height:44px;width:100%;border:1px solid var(--line);border-radius:12px;padding:0 14px;font-size:16px;font-family:inherit;background:#fff}
+input:focus,select:focus{outline:2px solid var(--a);border-color:transparent}
+button{height:44px;border:none;border-radius:12px;padding:0 16px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;background:#eee;color:#111}
+button.p{background:var(--a);color:#fff}button.sm{height:34px;padding:0 12px;font-size:13px}
 button.ghost{background:#fff;border:1px solid var(--line)}button.danger{background:#fff;color:var(--err);border:1px solid #f3c7c3}
 button:disabled{opacity:.5;cursor:default}
-.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
-.row input{flex:1;min-width:120px}
-table{width:100%;border-collapse:collapse;font-size:14px}
-th,td{text-align:left;padding:10px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
-th{font-size:12px;color:var(--m);font-weight:600}
-.bar{height:8px;background:#eee;border-radius:4px;overflow:hidden;width:90px;display:inline-block;vertical-align:middle;margin-right:6px}.bar i{display:block;height:100%;background:var(--a)}
+.row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.row input{flex:1;min-width:0}
+.list{display:flex;flex-direction:column;gap:8px}
+.li{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--line);border-radius:14px}
+.li .nm{flex:1;min-width:0}
+.li .nm b{font-size:16px}.li .nm small{display:block;color:var(--m);font-size:12px;margin-top:2px}
+.li .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.bar{height:8px;background:#eee;border-radius:4px;overflow:hidden;width:70px;display:inline-block;vertical-align:middle;margin-right:6px}.bar i{display:block;height:100%;background:var(--a)}
 .badge{display:inline-block;font-size:12px;font-weight:700;border-radius:8px;padding:2px 8px;background:#e7f6ec;color:var(--g)}
 .badge.w{background:#fff6d6;color:#9a7300}
 .code{font-size:40px;font-weight:900;letter-spacing:6px;color:#b17f00;background:#fffbea;border-radius:14px;text-align:center;padding:14px;margin:8px 0}
@@ -54,6 +58,22 @@ th{font-size:12px;color:var(--m);font-weight:600}
 .swatch{width:34px;height:34px;border-radius:50%;cursor:pointer;border:3px solid transparent}.swatch.on{border-color:#111}
 .icons{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}
 .iconbtn{display:flex;flex-direction:column;align-items:center;gap:3px;border:1px solid var(--line);border-radius:12px;padding:8px 10px;cursor:pointer;font-size:12px;color:#555;background:#fff}.iconbtn.on{border-color:currentColor;background:#fff7f6}
+#setup,#picker{max-width:520px;margin:0 auto;padding:30px 16px 90px}
+#login{max-width:520px;margin:0 auto}
+/* 도장 찍기 */
+.daywrap{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.dayrow{display:flex;align-items:center;gap:8px}
+.dayrow .dl{width:30px;font-weight:800;font-size:16px;flex:none;text-align:center}
+.dayrow.today .dl{color:var(--a)}
+.slots{display:flex;gap:7px;flex-wrap:wrap;flex:1}
+.slot{width:46px;height:46px;border-radius:50%;border:2px dashed #cfcfd4;background:#fafafa;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-weight:700;color:#888;font-size:15px;flex:none;padding:0}
+.slot .pn{font-size:9px;color:#aaa;font-weight:600}
+.slot.on{border-style:solid;background:#fff;box-shadow:inset 0 0 0 2px #fff,inset 0 0 0 4px currentColor}
+.slot.off{border:none;background:repeating-linear-gradient(-45deg,#eee 0 5px,#e2e2e6 5px 9px);color:#aaa;cursor:default}
+.stu-sel{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+.who{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.whochip{display:inline-flex;align-items:center;gap:5px;border:1.5px solid currentColor;border-radius:50px;padding:3px 10px;font-size:13px;font-weight:700}
+.pct-big{font-size:26px;font-weight:800}
 .tt{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:8px 0}
 .tt div{background:#f6f6f8;border-radius:10px;padding:8px;text-align:center;font-size:13px}
 .tt input,.tt select{width:100%;height:32px;font-size:13px;padding:0 6px;margin-top:4px}
@@ -101,16 +121,40 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
   </div>
 </section>
 
+<section id="picker" class="hidden">
+  <div class="card">
+    <span class="stamp">참 잘했어요!</span>
+    <h1 style="font-size:22px;margin:16px 0 4px">반 고르기</h1>
+    <p class="note">관리할 반을 골라요. 내가 만든 반과 초대받은 반이 보여요.</p>
+    <div class="list" id="pickerList" style="margin-bottom:12px"></div>
+    <button class="p" id="btnNewClass" style="width:100%;margin-bottom:8px">＋ 새 반 만들기</button>
+    <button class="ghost" id="btnJoinClass" style="width:100%">초대 코드로 들어가기</button>
+    <div class="link" id="btnLogout3">로그아웃</div>
+  </div>
+</section>
+
 <div id="app" class="hidden">
   <header>
     <span class="stamp">참 잘했어요!</span>
     <span class="t" id="hdrClass">우리 반</span>
     <span class="sp"></span>
-    <span class="t" id="hdrEmail"></span>
+    <button class="sm" id="btnSwitch">반 바꾸기</button>
     <button class="sm" id="btnLogout">로그아웃</button>
   </header>
   <main>
-    <div class="card wide">
+    <div id="tabStamp">
+      <div class="card">
+        <h2>✅ 도장 찍기 <small>학생을 고르고 교시를 눌러요</small></h2>
+        <div class="stu-sel"><select id="stampStudent"></select></div>
+        <div id="stampHead"></div>
+        <div class="daywrap" id="stampGrid"></div>
+        <div class="who" id="stampWho"></div>
+        <div class="msg" id="stampMsg"></div>
+      </div>
+    </div>
+
+    <div id="tabManage" class="hidden">
+    <div class="card">
       <h2>🖌️ 내 도장 <small>누가 찍었는지 학생 도장판에 보여요</small></h2>
       <div class="stampcard">
         <div class="stamp-prev" id="myPrev" style="color:#FF5A4E"><span id="myPrevIcon"></span><small id="myPrevName">선생님</small></div>
@@ -141,16 +185,16 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
       <div class="msg" id="pwMsg"></div>
     </div>
 
-    <div class="card wide">
-      <h2>⌚ 기기 연결 <small>승인 대기 중인 기기를 승인하거나, 연결을 해지해요</small></h2>
-      <table><thead><tr><th>기기</th><th>학생</th><th>코드</th><th>상태</th><th></th></tr></thead><tbody id="devBody"></tbody></table>
-      <div class="row" style="margin-top:12px"><button class="ghost" id="btnTabletCode">🖥 태블릿 연결 코드 만들기</button></div>
+    <div class="card">
+      <h2>⌚ 기기 연결 <small>승인·해지</small></h2>
+      <div class="list" id="devBody"></div>
+      <div class="row" style="margin-top:12px"><button class="ghost" id="btnTabletCode" style="width:100%">🖥 태블릿 연결 코드 만들기</button></div>
     </div>
 
-    <div class="card wide">
+    <div class="card">
       <h2>🧒 학생 <small id="stCount"></small></h2>
-      <div class="row"><input id="newName" placeholder="이름 또는 별명" maxlength="12"><button class="p" id="btnAdd">학생 등록</button></div>
-      <table><thead><tr><th>이름</th><th>이번 주</th><th>지난 주</th><th>시간표 (교시/조퇴)</th><th></th></tr></thead><tbody id="stBody"></tbody></table>
+      <div class="row"><input id="newName" placeholder="이름 또는 별명" maxlength="12"><button class="p" id="btnAdd">등록</button></div>
+      <div class="list" id="stBody" style="margin-top:4px"></div>
     </div>
 
     <div class="card">
@@ -160,9 +204,14 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
     </div>
     <div class="card">
       <h2>ℹ️ 도움말</h2>
-      <p class="note">• 도장은 선생님 앱, 워치(비밀번호), 학급게시 태블릿(비밀번호)에서 찍어요.<br>• 학생폰 앱은 보기만 할 수 있어요.<br>• 계정 삭제는 선생님 앱 › 관리 › 계정 삭제에서 할 수 있어요.</p>
+      <p class="note">• 웹에서 도장을 찍으면 워치·태블릿·학생 앱에 바로 보여요.<br>• 학생폰 앱은 보기만 할 수 있어요.<br>• 계정 삭제는 안드로이드 선생님 앱에서 할 수 있어요.</p>
+    </div>
     </div>
   </main>
+  <nav class="tabbar" id="tabbar">
+    <button class="on" data-tab="tabStamp"><span class="ic">✅</span>도장 찍기</button>
+    <button data-tab="tabManage"><span class="ic">⚙️</span>관리</button>
+  </nav>
 </div>
 
 <dialog id="dlg"><div id="dlgBody"></div><div class="row" style="justify-content:flex-end;margin-top:14px"><button class="ghost" id="dlgClose">닫기</button></div></dialog>
@@ -178,7 +227,7 @@ const firebaseConfig = {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail,
   EmailAuthProvider, reauthenticateWithCredential, updatePassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, onSnapshot, updateDoc, setDoc, addDoc, deleteDoc, writeBatch, arrayUnion, query, orderBy, serverTimestamp }
+import { getFirestore, doc, getDoc, getDocs, collection, onSnapshot, updateDoc, setDoc, addDoc, deleteDoc, writeBatch, runTransaction, arrayUnion, where, query, orderBy, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const app = initializeApp(firebaseConfig);
@@ -335,29 +384,65 @@ $("btnJoinTeacher").onclick = async () => {
   } catch (e) { say("setupMsg", authMsg(e)); }
 };
 
-let unsubs = [], cid = null, cls = null, students = [], devices = [], myUid = null, ensuring = false;
-function stopAll() { unsubs.forEach(u => u()); unsubs = []; }
-function show(sec) { ["login", "setup", "app"].forEach(s => $(s).classList.toggle("hidden", s !== sec)); }
+let subs = [], cid = null, cls = null, students = [], devices = [], myUid = null, ensuring = false, myCode = "1", myClassList = [];
+function stopSubs() { subs.forEach(u => u()); subs = []; }
+function show(sec) { ["login", "setup", "picker", "app"].forEach(s => $(s).classList.toggle("hidden", s !== sec)); }
 
-onAuthStateChanged(auth, user => {
-  stopAll(); cid = null;
+async function myClasses(uid) {
+  const [a, b] = await Promise.all([
+    getDocs(query(collection(db, "classes"), where("owner", "==", uid))),
+    getDocs(query(collection(db, "classes"), where("members", "array-contains", uid))),
+  ]);
+  const map = {};
+  [...a.docs, ...b.docs].forEach(d => { map[d.id] = { id: d.id, name: d.data().name || "우리 반", owner: d.data().owner === uid }; });
+  return Object.values(map);
+}
+function renderPicker() {
+  $("pickerList").innerHTML = myClassList.length ? myClassList.map(c =>
+    `<div class="li"><span class="nm"><b>${esc(c.name)}</b><small>${c.owner ? "내가 만든 반" : "초대받은 반"}</small></span><button class="p sm" data-enter="${c.id}">들어가기</button></div>`).join("")
+    : `<p class="note">아직 들어갈 반이 없어요. 새 반을 만들어 주세요.</p>`;
+}
+$("pickerList").onclick = e => { const b = e.target.closest("[data-enter]"); if (b) enterClass(b.dataset.enter); };
+$("btnNewClass").onclick = () => { show("setup"); $("setupSeg").children[0].click(); };
+$("btnJoinClass").onclick = () => { show("setup"); $("setupSeg").children[1].click(); };
+$("btnSwitch").onclick = async () => { myClassList = await myClasses(myUid); renderPicker(); show("picker"); };
+
+function enterClass(id) {
+  stopSubs(); cid = id;
+  setDoc(doc(db, "teachers", myUid), { classId: id, email: auth.currentUser?.email || "" }, { merge: true }).catch(() => {});
+  show("app"); setTab("tabStamp");
+  subs.push(onSnapshot(doc(db, "classes", cid), s => {
+    cls = s.data(); if (!cls) { $("btnSwitch").click(); return; }
+    $("hdrClass").textContent = cls.name || "우리 반"; $("className").value = cls.name || "";
+    myCode = cls.staff?.[myUid]?.code || "1";
+    ensureStaff(); renderMyStamp(); renderStamp();
+  }));
+  subs.push(onSnapshot(query(collection(db, "classes", cid, "students"), orderBy("order")), s => { students = s.docs.map(d => ({ id: d.id, ...d.data() })); renderStudents(); renderDevices(); renderStamp(); }));
+  subs.push(onSnapshot(collection(db, "classes", cid, "devices"), s => { devices = s.docs.map(d => ({ id: d.id, ...d.data() })); renderDevices(); renderStudents(); }));
+}
+
+onAuthStateChanged(auth, async user => {
+  stopSubs(); cid = null; cls = null;
   if (!user || user.isAnonymous) { myUid = null; show("login"); return; }
   myUid = user.uid;
-  $("hdrEmail").textContent = user.email || "";
-  unsubs.push(onSnapshot(doc(db, "teachers", user.uid), snap => {
-    const id = snap.data()?.classId;
-    if (!id) { show("setup"); return; }
-    show("app");
-    if (id === cid) return;
-    cid = id;
-    unsubs.push(onSnapshot(doc(db, "classes", cid), s => {
-      cls = s.data(); $("hdrClass").textContent = cls?.name || "우리 반"; $("className").value = cls?.name || "";
-      ensureStaff(); renderMyStamp();
-    }));
-    unsubs.push(onSnapshot(query(collection(db, "classes", cid, "students"), orderBy("order")), s => { students = s.docs.map(d => ({ id: d.id, ...d.data() })); renderStudents(); renderDevices(); }));
-    unsubs.push(onSnapshot(collection(db, "classes", cid, "devices"), s => { devices = s.docs.map(d => ({ id: d.id, ...d.data() })); renderDevices(); renderStudents(); }));
-  }));
+  try {
+    const t = await getDoc(doc(db, "teachers", user.uid));
+    const saved = t.data()?.classId;
+    myClassList = await myClasses(user.uid);
+    if (saved && myClassList.some(c => c.id === saved)) enterClass(saved);
+    else if (myClassList.length) { renderPicker(); show("picker"); }
+    else show("setup");
+  } catch (e) { show("setup"); say("setupMsg", authMsg(e)); }
 });
+$("btnLogout3").onclick = () => signOut(auth);
+
+// 탭 (도장 찍기 / 관리)
+function setTab(id) {
+  ["tabStamp", "tabManage"].forEach(t => $(t).classList.toggle("hidden", t !== id));
+  [...$("tabbar").children].forEach(b => b.classList.toggle("on", b.dataset.tab === id));
+  window.scrollTo(0, 0);
+}
+$("tabbar").onclick = e => { const b = e.target.closest("[data-tab]"); if (b) setTab(b.dataset.tab); };
 
 // 내 도장 정보가 없으면 만들기 (예전에 만든 반, 새로 들어온 선생님)
 async function ensureStaff() {
@@ -462,12 +547,11 @@ function renderDevices() {
   const name = id => students.find(s => s.id === id)?.name || (id ? "(삭제된 학생)" : "반 전체");
   const label = t => ({ watch: "⌚ 워치", phone: "📱 학생폰", tablet: "🖥 태블릿" }[t] || t);
   const rows = [...devices].sort((a, b) => (a.status === "ok") - (b.status === "ok"));
-  $("devBody").innerHTML = rows.length ? rows.map(d => `<tr>
-      <td>${label(d.type)} <small style="color:#999">${esc(d.model)}</small></td><td>${esc(name(d.studentId))}</td><td>${esc(d.code)}</td>
-      <td>${d.status === "ok" ? '<span class="badge">연결됨</span>' : '<span class="badge w">승인 대기</span>'}</td>
-      <td style="text-align:right">${d.status === "ok" ? `<button class="sm danger" data-unlink="${d.id}">해지</button>`
-        : `<button class="sm p" data-approve="${d.id}">승인</button> <button class="sm ghost" data-unlink="${d.id}">거절</button>`}</td></tr>`).join("")
-    : `<tr><td colspan="5" style="color:#999">연결된 기기가 없어요</td></tr>`;
+  $("devBody").innerHTML = rows.length ? rows.map(d => `<div class="li">
+      <span class="nm"><b>${label(d.type)} · ${esc(d.code)}</b><small>${esc(name(d.studentId))} · ${d.status === "ok" ? "연결됨" : "승인 대기"}</small></span>
+      <span class="acts">${d.status === "ok" ? `<button class="sm danger" data-unlink="${d.id}">해지</button>`
+        : `<button class="sm p" data-approve="${d.id}">승인</button><button class="sm ghost" data-unlink="${d.id}">거절</button>`}</span></div>`).join("")
+    : `<p class="note">연결된 기기가 없어요</p>`;
 }
 $("devBody").onclick = async e => {
   const a = e.target.dataset.approve, u = e.target.dataset.unlink;
@@ -478,22 +562,26 @@ $("devBody").onclick = async e => {
 };
 
 // ───────── 학생 ─────────
+function getPL(st) {
+  const periods = Array.isArray(st.periods) && st.periods.length === 5 ? st.periods : [6, 7, 6, 7, 6];
+  const leave = Array.isArray(st.leave) && st.leave.length === 5 ? st.leave : [0, 0, 0, 0, 0];
+  const lv = d => (leave[d] >= 2 && leave[d] <= periods[d]) ? leave[d] : 0;
+  const avail = d => lv(d) ? lv(d) - 1 : periods[d];
+  const isOff = (d, p) => lv(d) && p >= lv(d);
+  return { periods, lv, avail, isOff };
+}
 function renderStudents() {
   $("stCount").textContent = `${students.length}명`;
   const mon = mondayStr();
-  $("stBody").innerHTML = students.length ? students.map(st => {
-    const w = weekStats(st, mon), lw = lastWeekPct(st);
-    const periods = Array.isArray(st.periods) ? st.periods : [6, 7, 6, 7, 6];
-    const leave = Array.isArray(st.leave) ? st.leave : [0, 0, 0, 0, 0];
-    const tt = periods.map((p, d) => `${SHORT[d]}${p}${leave[d] >= 2 && leave[d] <= p ? `(${leave[d]}~조퇴)` : ""}`).join(" ");
+  $("stBody").innerHTML = students.length ? students.map((st, idx) => {
+    const w = weekStats(st, mon);
+    const { periods, lv } = getPL(st);
+    const tt = periods.map((p, d) => `${SHORT[d]}${p}${lv(d) ? `(${lv(d)}~조퇴)` : ""}`).join(" ");
     const nDev = devices.filter(d => d.studentId === st.id && d.status === "ok").length;
-    return `<tr><td><b>${esc(st.name)}</b><br><small style="color:#999">기기 ${nDev}대</small></td>
-      <td><span class="bar"><i style="width:${w.pct}%"></i></span>${w.pct}%</td><td>${lw == null ? "–" : lw + "%"}</td>
-      <td style="font-size:13px">${tt}</td>
-      <td style="text-align:right;white-space:nowrap"><button class="sm ghost" data-code="${st.id}">기기 코드</button>
-        <button class="sm ghost" data-tt="${st.id}">시간표</button> <button class="sm ghost" data-rename="${st.id}">이름</button>
-        <button class="sm danger" data-del="${st.id}">삭제</button></td></tr>`;
-  }).join("") : `<tr><td colspan="5" style="color:#999">아직 학생이 없어요</td></tr>`;
+    return `<div class="li"><span class="nm"><b>${esc(st.name)}</b><small>이번 주 ${w.pct}% · 기기 ${nDev}대 · ${tt}</small></span>
+      <span class="acts"><button class="sm ghost" data-up="${st.id}" ${idx === 0 ? "disabled" : ""}>▲</button><button class="sm ghost" data-down="${st.id}" ${idx === students.length - 1 ? "disabled" : ""}>▼</button>
+      <button class="sm ghost" data-edit="${st.id}">수정</button></span></div>`;
+  }).join("") : `<p class="note">아직 학생이 없어요. 위에서 등록해 주세요.</p>`;
 }
 $("btnAdd").onclick = async () => {
   const n = $("newName").value.trim(); if (!n) return;
@@ -504,36 +592,105 @@ $("btnAdd").onclick = async () => {
 };
 $("newName").addEventListener("keydown", e => { if (e.key === "Enter") $("btnAdd").click(); });
 $("stBody").onclick = async e => {
-  const t = e.target.dataset; const st = students.find(s => s.id === (t.code || t.tt || t.rename || t.del)); if (!st) return;
+  const t = e.target.dataset, id = t.up || t.down || t.edit;
+  const idx = students.findIndex(s => s.id === id), st = students[idx]; if (!st) return;
   try {
-    if (t.code) {
-      const c = await makeCode("student", st.id);
-      showDialog(`<h2>⌚ ${esc(st.name)} 워치·학생폰 연결 코드</h2><div class="code">${c}</div><p class="note">워치 앱이나 학생폰 앱을 처음 열면 나오는 칸에 넣어 주세요. 30분 동안 쓸 수 있어요.</p>`);
+    if (t.up || t.down) {
+      const other = students[idx + (t.up ? -1 : 1)];
+      if (other) { const b = writeBatch(db); b.update(doc(db, "classes", cid, "students", st.id), { order: other.order }); b.update(doc(db, "classes", cid, "students", other.id), { order: st.order }); await b.commit(); }
+      return;
     }
-    if (t.rename) { const n = prompt("새 이름 또는 별명", st.name); if (n && n.trim()) await updateDoc(doc(db, "classes", cid, "students", st.id), { name: n.trim().slice(0, 12) }); }
-    if (t.del && confirm(`${st.name} 학생과 도장 기록, 연결된 기기를 모두 지울까요? 되돌릴 수 없어요.`)) {
-      const b = writeBatch(db);
-      devices.filter(d => d.studentId === st.id).forEach(d => b.delete(doc(db, "classes", cid, "devices", d.id)));
-      b.delete(doc(db, "classes", cid, "students", st.id));
-      await b.commit();
-    }
-    if (t.tt) openTimetable(st);
+    if (t.edit) openStudent(st);
   } catch (err) { alert(authMsg(err)); }
 };
-function openTimetable(st) {
-  const periods = Array.isArray(st.periods) ? st.periods : [6, 7, 6, 7, 6];
-  const leave = Array.isArray(st.leave) ? st.leave : [0, 0, 0, 0, 0];
-  showDialog(`<h2>🗓 ${esc(st.name)} 시간표</h2><p class="note">요일별 교시 수와, 몇 교시부터 조퇴인지 정해요.</p>
+function openStudent(st) {
+  const { periods, lv } = getPL(st);
+  showDialog(`<h2>${esc(st.name)}</h2>
+    <p class="note" style="margin-top:4px">이름 바꾸기</p>
+    <div class="row"><input id="edName" value="${esc(st.name)}" maxlength="12"><button class="p sm" id="edRename">저장</button></div>
+    <p class="note" style="margin-top:10px">시간표 · 조퇴 (이 학생만)</p>
     <div class="tt">${SHORT.map((d, i) => `<div><b>${d}</b>
       <select id="tp${i}">${[1,2,3,4,5,6,7,8,9].map(n => `<option ${n === periods[i] ? "selected" : ""}>${n}</option>`).join("")}</select>
-      <select id="tl${i}"><option value="0">조퇴 없음</option>${[2,3,4,5,6,7,8,9].map(n => `<option value="${n}" ${n === leave[i] ? "selected" : ""}>${n}교시~</option>`).join("")}</select></div>`).join("")}</div>
-    <button class="p" id="ttSave">저장</button>`);
+      <select id="tl${i}"><option value="0">조퇴 없음</option>${[2,3,4,5,6,7,8,9].map(n => `<option value="${n}" ${n === lv(i) ? "selected" : ""}>${n}교시~</option>`).join("")}</select></div>`).join("")}</div>
+    <button class="p" id="ttSave" style="width:100%">시간표 저장</button>
+    <button class="ghost" id="edCode" style="width:100%;margin-top:8px">⌚ 워치·학생폰 연결 코드 만들기</button>
+    <button class="danger" id="edDel" style="width:100%;margin-top:8px">🗑 이 학생 삭제</button>`);
+  const ref = doc(db, "classes", cid, "students", st.id);
+  $("edRename").onclick = async () => { const n = $("edName").value.trim(); if (n) { try { await updateDoc(ref, { name: n.slice(0, 12) }); $("dlg").close(); } catch (e) { alert(authMsg(e)); } } };
   $("ttSave").onclick = async () => {
     const p = SHORT.map((_, i) => +$("tp" + i).value);
     const l = SHORT.map((_, i) => { const v = +$("tl" + i).value; return v >= 2 && v <= p[i] ? v : 0; });
-    try { await updateDoc(doc(db, "classes", cid, "students", st.id), { periods: p, leave: l }); $("dlg").close(); } catch (e) { alert(authMsg(e)); }
+    try { await updateDoc(ref, { periods: p, leave: l }); $("dlg").close(); } catch (e) { alert(authMsg(e)); }
+  };
+  $("edCode").onclick = async () => { try { const c = await makeCode("student", st.id); showDialog(`<h2>⌚ ${esc(st.name)} 연결 코드</h2><div class="code">${c}</div><p class="note">워치·학생폰 앱을 처음 열면 나오는 칸에 넣어 주세요. 30분 동안 쓸 수 있어요.</p>`); } catch (e) { alert(authMsg(e)); } };
+  $("edDel").onclick = async () => {
+    if (!confirm(`${st.name} 학생과 도장 기록, 연결된 기기를 모두 지울까요? 되돌릴 수 없어요.`)) return;
+    try { const b = writeBatch(db); devices.filter(d => d.studentId === st.id).forEach(d => b.delete(doc(db, "classes", cid, "devices", d.id))); b.delete(ref); await b.commit(); $("dlg").close(); } catch (e) { alert(authMsg(e)); }
   };
 }
+
+// ───────── 웹에서 도장 찍기 ─────────
+function lookFor(code) {
+  const st = Object.values(cls?.staff || {}).find(s => s.code === code);
+  return st ? { color: st.color, icon: st.icon, name: st.name } : { color: STAMP_COLORS[0], icon: "thumb", name: "" };
+}
+function storedWeekRec(s) {
+  if (!s.week) return null;
+  const { periods, lv, avail } = getPL(s);
+  let total = 0, got = 0; const dd = [];
+  for (let d = 0; d < 5; d++) {
+    const bits = (s.days || [])[d] || ""; let g = 0;
+    for (let i = 0; i < periods[d]; i++) if (bits[i] && bits[i] !== "0" && !(lv(d) && i + 1 >= lv(d))) g++;
+    const a = avail(d); total += a; got += g; dd.push(a ? Math.round(g * 100 / a) : 0);
+  }
+  return { w: s.week, p: total ? Math.round(got * 100 / total) : 0, d: dd };
+}
+async function setStampTx(sid, d, i, on) {
+  await runTransaction(db, async tx => {
+    const ref = doc(db, "classes", cid, "students", sid);
+    const snap = await tx.get(ref); const s = snap.data() || {};
+    const { periods } = getPL(s); const mon = mondayStr(); const same = s.week === mon;
+    const arr = [0, 1, 2, 3, 4].map(dd => { const bits = same ? ((s.days || [])[dd] || "") : ""; return Array.from({ length: periods[dd] }, (_, k) => (bits[k] && bits[k] !== "0") ? bits[k] : "0"); });
+    const upd = {};
+    if (!same) { const rec = storedWeekRec(s); if (rec) upd.hist = (s.hist || []).filter(h => h.w !== rec.w).concat([rec]).sort((a, b) => a.w < b.w ? -1 : 1).slice(-60); upd.memo = {}; }
+    arr[d][i] = on ? myCode : "0";
+    upd.week = mon; upd.days = arr.map(a => a.join("")); upd.updatedAt = serverTimestamp();
+    if (on) upd.last = { at: Date.now(), d, i, by: myCode };
+    tx.update(ref, upd);
+  });
+}
+let stampSid = null;
+function renderStamp() {
+  const sel = $("stampStudent"), prev = stampSid || sel.value;
+  sel.innerHTML = students.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join("");
+  if (!students.length) { stampSid = null; $("stampGrid").innerHTML = `<p class="note">학생을 먼저 등록해 주세요 (관리 탭).</p>`; $("stampHead").innerHTML = ""; $("stampWho").innerHTML = ""; return; }
+  stampSid = students.some(s => s.id === prev) ? prev : students[0].id;
+  sel.value = stampSid;
+  const st = students.find(s => s.id === stampSid); if (!st) return;
+  const mon = mondayStr(), same = st.week === mon, { periods, lv, isOff } = getPL(st);
+  const today = (new Date().getDay() + 6) % 7;
+  const w = weekStats(st, mon);
+  $("stampHead").innerHTML = `<div class="row" style="margin:4px 0 2px;align-items:baseline"><span class="pct-big">${w.pct}%</span><span class="note" style="margin:0">이번 주 달성률</span></div>`;
+  $("stampGrid").innerHTML = [0, 1, 2, 3, 4].map(d => {
+    const bits = same ? ((st.days || [])[d] || "") : "";
+    const slots = Array.from({ length: periods[d] }, (_, i) => {
+      if (isOff(d, i + 1)) return `<div class="slot off"><span>${i + 1}</span><span class="pn">조퇴</span></div>`;
+      const m = (bits[i] && bits[i] !== "0") ? bits[i] : "0";
+      if (m !== "0") { const lk = lookFor(m); return `<div class="slot on" style="color:${hex(lk.color)}" data-d="${d}" data-i="${i}" data-on="1">${iconSvg(lk.icon, 22)}</div>`; }
+      return `<div class="slot" data-d="${d}" data-i="${i}" data-on="0">${i + 1}<span class="pn">교시</span></div>`;
+    }).join("");
+    return `<div class="dayrow ${d === today ? "today" : ""}"><div class="dl">${SHORT[d]}</div><div class="slots">${slots}</div></div>`;
+  }).join("");
+  const staff = Object.values(cls?.staff || {}).sort((a, b) => a.code < b.code ? -1 : 1);
+  $("stampWho").innerHTML = staff.length ? `<span class="note" style="margin:0 6px 0 0">도장 주인</span>` + staff.map(s => `<span class="whochip" style="color:${hex(s.color)}">${iconSvg(s.icon, 16)}${esc(s.name)}</span>`).join("") : "";
+}
+$("stampStudent").onchange = () => { stampSid = $("stampStudent").value; renderStamp(); };
+$("stampGrid").onclick = async e => {
+  const el = e.target.closest("[data-d]"); if (!el || !stampSid) return;
+  const d = +el.dataset.d, i = +el.dataset.i, on = el.dataset.on !== "1";
+  el.style.opacity = ".5";
+  try { await setStampTx(stampSid, d, i, on); } catch (err) { say("stampMsg", authMsg(err)); }
+};
 </script>
 </body>
 </html>
