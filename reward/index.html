@@ -246,7 +246,9 @@ onAuthStateChanged(auth,async user=>{
   try{
     const t=await getDoc(doc(db,"teachers",user.uid));const saved=t.data()?.classId;
     myClassList=await myClasses(user.uid);
-    if(saved&&myClassList.some(c=>c.id===saved))enterClass(saved);
+    const wanted=new URLSearchParams(location.search).get("class");
+    if(wanted&&myClassList.some(c=>c.id===wanted))enterClass(wanted);
+    else if(saved&&myClassList.some(c=>c.id===saved))enterClass(saved);
     else if(myClassList.length===1)enterClass(myClassList[0].id);
     else if(myClassList.length){renderPicker();show("picker");}
     else{show("picker");$("pickerList").innerHTML=`<p class="note">들어갈 반이 없어요. 선생님 앱에서 반을 먼저 만들어 주세요.</p>`;}
