@@ -6,9 +6,13 @@
 <title>우리 반 집단보상</title>
 <meta name="theme-color" content="#FF5A4E">
 <style>
-:root{--a:#FF5A4E;--a2:#F0392B;--ink:#1a1a1a;--m:#8a8a8a;--line:#eee;--gold:#8a6d00}
+@property --a{syntax:'<color>';inherits:true;initial-value:#FF5A4E}
+@property --a2{syntax:'<color>';inherits:true;initial-value:#F0392B}
+@property --bg1{syntax:'<color>';inherits:true;initial-value:#ffffff}
+@property --bg2{syntax:'<color>';inherits:true;initial-value:#fff0ee}
+:root{--a:#FF5A4E;--a2:#F0392B;--bg1:#ffffff;--bg2:#fff0ee;--ink:#1a1a1a;--m:#8a8a8a;--line:#eee;--gold:#8a6d00}
 *{box-sizing:border-box;margin:0;padding:0;font-family:"Pretendard","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
-body{background:linear-gradient(160deg,#fff,#fff0ee);min-height:100vh;color:var(--ink)}
+body{background:linear-gradient(160deg,var(--bg1),var(--bg2));min-height:100vh;color:var(--ink)}
 button{border:none;border-radius:12px;font-weight:700;font-family:inherit;cursor:pointer;background:#eee;color:#111}
 button.p{background:var(--a);color:#fff}
 button:disabled{opacity:.5;cursor:default}
@@ -105,6 +109,35 @@ dialog h2{font-size:19px;margin-bottom:4px}
 .confetti{position:absolute;top:-20px;width:10px;height:14px;animation:fall 2.6s linear forwards}
 @keyframes fall{to{transform:translateY(105vh) rotate(540deg)}}
 .spin{display:inline-block;animation:sp 1s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+
+/* ── 화면보호기 모드 ── */
+html.saver{transition:--a 6s ease,--a2 6s ease,--bg1 6s ease,--bg2 6s ease}
+html.saver body{overflow:hidden}
+html.saver.idle body{cursor:none}
+html.saver #btnRefresh,html.saver #btnSettings,html.saver #btnSaver{display:none}
+html.saver .chip{pointer-events:none}
+html.saver .fill{background:linear-gradient(90deg,var(--a),var(--a2))}
+html.saver .chip{border-color:color-mix(in srgb,var(--a) 30%,#fff)}
+html.saver #display .wrap{position:relative;z-index:1;animation:drift 140s ease-in-out infinite alternate}
+html.saver .bignum .n{animation:breathe 7s ease-in-out infinite}
+html.saver .top .stamp{animation:bob 9s ease-in-out infinite}
+@keyframes drift{0%{transform:translate(0,0) scale(.93)}20%{transform:translate(2.5vw,-2vh) scale(.93)}40%{transform:translate(-2vw,2.2vh) scale(.93)}60%{transform:translate(1.6vw,1.8vh) scale(.93)}80%{transform:translate(-2.4vw,-1.4vh) scale(.93)}100%{transform:translate(.8vw,-2.4vh) scale(.93)}}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@keyframes bob{0%,100%{transform:rotate(-4deg) translateY(0)}50%{transform:rotate(-1deg) translateY(-6px)}}
+#saverBg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;display:none}
+html.saver #saverBg{display:block}
+#saverBg i{position:absolute;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--a) 22%,transparent) 0%,transparent 70%);animation:floaty linear infinite alternate}
+@keyframes floaty{0%{transform:translate(0,0)}50%{transform:translate(18vw,-14vh)}100%{transform:translate(-12vw,10vh)}}
+#saverBar{position:fixed;right:18px;bottom:18px;z-index:70;display:none;align-items:center;gap:8px;background:#ffffffe6;border:1px solid #0000000f;box-shadow:0 6px 20px #0000001a;border-radius:40px;padding:6px 8px 6px 14px;transition:opacity .6s;backdrop-filter:blur(6px)}
+html.saver #saverBar{display:flex}
+html.saver.idle #saverBar{opacity:0;pointer-events:none}
+#saverBar button{height:36px;min-width:36px;padding:0 10px;border-radius:30px;background:#f3f3f3;font-size:15px}
+#saverBar button.p{background:var(--a);color:#fff}
+#saverBar .tt{font-size:14px;font-weight:800;color:#555;min-width:96px;white-space:nowrap}
+#saverBar input[type=range]{width:90px;height:auto;padding:0;border:none;background:none;accent-color:var(--a)}
+#saverTap{position:fixed;inset:0;z-index:80;display:none;align-items:flex-end;justify-content:center;padding-bottom:12vh;cursor:pointer}
+#saverTap.on{display:flex}
+#saverTap span{background:#fff;border-radius:40px;padding:14px 26px;font-weight:800;font-size:clamp(16px,1.8vw,22px);box-shadow:0 8px 24px #0002;color:var(--a2);animation:bob 3s ease-in-out infinite}
 </style>
 </head>
 <body>
@@ -142,6 +175,7 @@ dialog h2{font-size:19px;margin-bottom:4px}
     <span class="sp"></span>
     <button class="ibtn p" id="btnRefresh">🔄 새로고침</button>
     <button class="ibtn" id="btnSettings">⚙️ 설정</button>
+    <button class="ibtn" id="btnSaver">🌙 화면보호기</button>
     <div class="updated" id="updated"></div>
   </div>
   <div class="hero">
@@ -190,6 +224,17 @@ dialog h2{font-size:19px;margin-bottom:4px}
 </dialog>
 
 <div class="celebrate" id="celebrate"></div>
+
+<!-- 화면보호기 -->
+<div id="saverBg"><i style="width:46vw;height:46vw;left:-8vw;top:-10vh;animation-duration:70s"></i><i style="width:36vw;height:36vw;right:-6vw;top:30vh;animation-duration:90s;animation-delay:-30s"></i><i style="width:30vw;height:30vw;left:30vw;bottom:-12vh;animation-duration:80s;animation-delay:-50s"></i><i style="width:22vw;height:22vw;left:60vw;top:-6vh;animation-duration:60s;animation-delay:-20s"></i></div>
+<div id="saverBar">
+  <span class="tt" id="saverTitle">🎵 음악 꺼짐</span>
+  <button class="p" id="musPlay" title="재생/일시정지">▶</button>
+  <button id="musNext" title="다음 곡">⏭</button>
+  <input type="range" id="musVol" min="0" max="100" value="50" title="음량">
+  <button id="saverExit" title="화면보호기 끄기">✕ 나가기</button>
+</div>
+<div id="saverTap"><span>🎵 화면을 한 번 누르면 음악이 시작돼요</span></div>
 
 <script type="module">
 const firebaseConfig = { apiKey:"AIzaSyC0rbFrct_9AgaVffxxcqitqJCJufRS9_Q", authDomain:"hani-praise.firebaseapp.com", projectId:"hani-praise" };
@@ -255,7 +300,7 @@ onAuthStateChanged(auth,async user=>{
   }catch(e){show("login");say("loginMsg",authMsg(e));}
 });
 
-async function enterClass(id){cid=id;show("display");await refresh(true);}
+async function enterClass(id){cid=id;show("display");await refresh(true);if(new URLSearchParams(location.search).has("saver")&&!saverOn)enterSaver(false);}
 
 // ── 핵심: 집계 + 저장 ──
 let busy=false;
@@ -282,7 +327,7 @@ async function refresh(persist){
     cur={total,S,start,goal,rewards,archive};
     if(persist){ try{ await updateDoc(doc(db,"classes",cid),{"teamReward.start":start,"teamReward.archive":archive,"teamReward.lastWk":lastWk,"teamReward.lastWkSum":lastWkSum,"teamReward.goal":goal,"teamReward.rewards":rewards,"teamReward.updatedAt":Date.now()}); }catch(e){} }
     render(); stampUpdatedTime();
-  }catch(e){ alert("불러오지 못했어요: "+authMsg(e)); }
+  }catch(e){ if(saverOn){ console.warn(e); $("updated").textContent="연결이 잠시 끊겼어요 · 곧 다시 불러올게요"; } else alert("불러오지 못했어요: "+authMsg(e)); }
   finally{ setBusy(false); }
 }
 function stampUpdatedTime(){const d=new Date();const hh=d.getHours(),mm=String(d.getMinutes()).padStart(2,"0");const ap=hh<12?"오전":"오후";const h12=((hh+11)%12)+1;$("updated").textContent=`${cur.start}부터 모으는 중 · 마지막 업데이트 ${ap} ${h12}:${mm}`;}
@@ -361,6 +406,116 @@ $("setSave").onclick=async()=>{
     $("setDlg").close(); await refresh(true);
   }catch(e){say("setMsg",authMsg(e));}
 };
+
+// ══════════ 잔잔한 BGM (Web Audio로 직접 만드는 음악 · 저작권 없음) ══════════
+const Music=(()=>{
+  let ctx=null,master,bus,timer=null,playing=false,switching=false,idx=0,trackStart=0,nextT=0,step=0,rain=null;
+  let vol=(()=>{try{const v=localStorage.getItem("saverVol");return v==null?0.5:+v;}catch(e){return 0.5;}})();
+  const TRACK_LEN=200; // 한 곡 약 3분 20초
+  const f=m=>440*Math.pow(2,(m-69)/12);
+  const pick=a=>a[Math.floor(Math.random()*a.length)];
+  function impulse(sec,decay){const len=ctx.sampleRate*sec,b=ctx.createBuffer(2,len,ctx.sampleRate);for(let c=0;c<2;c++){const d=b.getChannelData(c);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,decay);}return b;}
+  function init(){
+    ctx=new (window.AudioContext||window.webkitAudioContext)();
+    master=ctx.createGain();master.gain.value=0;
+    const comp=ctx.createDynamicsCompressor();comp.threshold.value=-18;comp.ratio.value=3;
+    master.connect(comp).connect(ctx.destination);
+    const rev=ctx.createConvolver();rev.buffer=impulse(4.5,2.6);const rg=ctx.createGain();rg.gain.value=.5;rev.connect(rg).connect(master);
+    bus=ctx.createGain();bus.connect(master);bus.connect(rev);
+  }
+  // 한 음 연주: partials=[[배수,세기]...]
+  function note(t,m,{dur=2,type="sine",gain=.1,attack=.01,partials=[[1,1]],cutoff=0,detune=0}={}){
+    t+=Math.random()*.02; // 사람이 치는 듯한 미세한 흔들림
+    const g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(gain,t+attack);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    let out=g;if(cutoff){const lp=ctx.createBiquadFilter();lp.type="lowpass";lp.frequency.value=cutoff;g.connect(lp);out=lp;}
+    const pan=ctx.createStereoPanner?ctx.createStereoPanner():null;if(pan){pan.pan.value=(Math.random()-.5)*.6;out.connect(pan).connect(bus);}else out.connect(bus);
+    for(const[mul,amp]of partials){const o=ctx.createOscillator();o.type=type;o.frequency.value=f(m)*mul;o.detune.value=detune;const og=ctx.createGain();og.gain.value=amp;o.connect(og).connect(g);o.start(t);o.stop(t+dur+.1);}
+  }
+  const pad=(t,ch,len,{gain=.022,type="sine",cutoff=0,det=0}={})=>ch.forEach(m=>{note(t,m,{dur:len,type,gain,attack:len*.3,cutoff,detune:-det});if(det)note(t,m,{dur:len,type,gain,attack:len*.3,cutoff,detune:det});});
+  const PIANO={type:"triangle",partials:[[1,1],[2,.35],[3,.12]],attack:.006,cutoff:2600};
+  const BOX={type:"sine",partials:[[1,1],[2,.22],[3.01,.07]],attack:.002};
+  const EP={type:"sine",partials:[[1,1],[2,.18],[4,.04]],attack:.012};
+  function startRain(){const len=ctx.sampleRate*3,b=ctx.createBuffer(1,len,ctx.sampleRate),d=b.getChannelData(0);let last=0;for(let i=0;i<len;i++){last=(last+.04*(Math.random()*2-1))/1.04;d[i]=last*3+(Math.random()*2-1)*.25;}
+    const s=ctx.createBufferSource();s.buffer=b;s.loop=true;const hp=ctx.createBiquadFilter();hp.type="highpass";hp.frequency.value=500;const lp=ctx.createBiquadFilter();lp.type="lowpass";lp.frequency.value=3200;const g=ctx.createGain();g.gain.value=0;g.gain.linearRampToValueAtTime(.09,ctx.currentTime+4);s.connect(hp).connect(lp).connect(g).connect(master);s.start();rain={s,g};}
+  function stopRain(){if(!rain)return;const r=rain;rain=null;r.g.gain.setTargetAtTime(0,ctx.currentTime,.6);setTimeout(()=>{try{r.s.stop();}catch(e){}},3000);}
+  const TRACKS=[
+    {name:"아침 햇살",bpm:72,chords:[[48,55,60,64,67],[45,52,57,60,64],[41,48,53,57,60],[43,50,55,59,62]],mel:[72,74,76,79,81,84],
+     at(s,t){const ch=this.chords[Math.floor(s/16)%4],i=s%16;
+       if(i===0){pad(t,ch.slice(0,3),7.5,{gain:.018});note(t,ch[0]-12,{...PIANO,dur:5,gain:.09});}
+       note(t,ch[[1,2,3,4,3,2,3,1][i%8]],{...PIANO,dur:2.6,gain:.055});
+       if(i%2===0&&Math.random()<.32)note(t,pick(this.mel),{...PIANO,dur:3,gain:.07});}},
+    {name:"별빛 오르골",bpm:84,chords:[[53,60,65,69],[50,57,62,65],[46,53,58,62],[48,55,60,64]],
+     at(s,t){const ch=this.chords[Math.floor(s/16)%4],i=s%16;
+       if(i%8===0)note(t,ch[0]-12,{type:"sine",dur:3.5,gain:.07,attack:.05});
+       if(i%2===0)note(t,ch[[0,2,1,3,2,1,3,2][(i/2)%8]]+24,{...BOX,dur:1.8,gain:.06});
+       if(i%4===3&&Math.random()<.4)note(t,pick(ch)+36,{...BOX,dur:1.4,gain:.03});}},
+    {name:"구름 산책",bpm:56,chords:[[50,57,61,64,66],[47,54,57,62,64],[43,55,59,62,66],[45,52,57,59,64]],mel:[74,76,78,81,83],
+     at(s,t){const ch=this.chords[Math.floor(s/16)%4],i=s%16,sp=60/this.bpm/2;
+       if(i===0){pad(t,ch,16*sp+1.5,{gain:.012,type:"sawtooth",cutoff:750,det:8});note(t,ch[0]-12,{type:"sine",dur:9,gain:.08,attack:1.5});}
+       if(i%2===0&&Math.random()<.18)note(t,pick(this.mel),{type:"sine",dur:3.5,gain:.06,attack:.25});}},
+    {name:"비 오는 날",bpm:64,rain:true,chords:[[45,57,60,64,67],[41,57,60,64,65],[48,55,59,64,67],[40,55,59,62,64]],
+     at(s,t){const ch=this.chords[Math.floor(s/16)%4],i=s%16;
+       if(i===0){note(t,ch[0],{...EP,dur:6,gain:.08});[1,2,3].forEach((k,j)=>note(t+j*.06,ch[k],{...EP,dur:5,gain:.045}));}
+       if(i===8)[2,3,4].forEach((k,j)=>note(t+j*.07,ch[k],{...EP,dur:4,gain:.035}));
+       if(i%2===1&&Math.random()<.22)note(t,pick(ch)+12,{...EP,dur:2.8,gain:.045});}},
+    {name:"숲속 쉼터",bpm:66,chords:[[43,50,55,59,62],[40,47,55,59,64],[36,48,52,55,60],[38,50,54,57,62]],mel:[67,69,71,74,76,79],
+     at(s,t){const ch=this.chords[Math.floor(s/12)%4],i=s%12; // 3박 왈츠
+       if(i===0){note(t,ch[0],{type:"sine",dur:4,gain:.08,attack:.03});pad(t,ch.slice(1,4),5.5,{gain:.012});}
+       if(i===4||i===8)[2,3,4].forEach(k=>note(t,ch[k],{...PIANO,dur:1.6,gain:.03}));
+       if(i%2===0&&Math.random()<.28)note(t,pick(this.mel)+12,{...BOX,dur:2.2,gain:.045});}},
+  ];
+  function startTrack(){const tr=TRACKS[idx];step=0;nextT=ctx.currentTime+.25;trackStart=ctx.currentTime;if(tr.rain)startRain();$("saverTitle").textContent="🎵 "+tr.name;}
+  function tick(){if(!playing||switching)return;const tr=TRACKS[idx],sp=60/tr.bpm/2;while(nextT<ctx.currentTime+1.6){tr.at(step,nextT);step++;nextT+=sp;}if(ctx.currentTime-trackStart>TRACK_LEN)next();}
+  function fadeTo(v,sec){master.gain.cancelScheduledValues(ctx.currentTime);master.gain.setValueAtTime(master.gain.value,ctx.currentTime);master.gain.linearRampToValueAtTime(v,ctx.currentTime+sec);}
+  function play(){if(!ctx)init();ctx.resume();if(playing)return;playing=true;startTrack();fadeTo(vol,2);clearInterval(timer);timer=setInterval(tick,200);tick();$("musPlay").textContent="❚❚";}
+  function pause(){if(!ctx||!playing)return;playing=false;fadeTo(0,.8);stopRain();clearInterval(timer);setTimeout(()=>{if(!playing)ctx.suspend();},1000);$("musPlay").textContent="▶";$("saverTitle").textContent="🎵 일시정지";}
+  function next(){if(!ctx||switching)return;if(!playing){idx=(idx+1)%TRACKS.length;$("saverTitle").textContent="🎵 "+TRACKS[idx].name;return;}switching=true;fadeTo(0,2.5);stopRain();setTimeout(()=>{idx=(idx+1)%TRACKS.length;switching=false;if(!playing)return;startTrack();fadeTo(vol,2.5);},2700);}
+  function setVol(v){vol=v;try{localStorage.setItem("saverVol",v);}catch(e){}if(ctx&&playing&&!switching)master.gain.setTargetAtTime(v,ctx.currentTime,.2);}
+  return{play,pause,next,setVol,get playing(){return playing;},get vol(){return vol;},shuffle(){idx=Math.floor(Math.random()*TRACKS.length);}};
+})();
+
+// ══════════ 화면보호기 모드 ══════════
+const THEMES=[["#FF5A4E","#F0392B","#ffffff","#fff0ee"],["#FF8A3D","#E2690F","#fffaf3","#ffeeda"],["#D99A00","#B07D00","#fffdf2","#fff4c8"],["#1FB58F","#0F8F6E","#f5fffb","#d9f6ea"],["#3D8BFF","#1F64D6","#f5f9ff","#d9e8ff"],["#9B5DE5","#7A3CC6","#faf6ff","#ebdfff"],["#FF5C9A","#DE3A7A","#fff7fa","#ffdfeb"]];
+let saverOn=false,colorTimer=null,refreshTimer=null,idleTimer=null,themeIdx=0,wakeLock=null,wantMusic=true;
+const root=document.documentElement;
+function applyTheme(i){const[a,a2,b1,b2]=THEMES[i];root.style.setProperty("--a",a);root.style.setProperty("--a2",a2);root.style.setProperty("--bg1",b1);root.style.setProperty("--bg2",b2);}
+async function keepAwake(){try{if("wakeLock" in navigator&&saverOn)wakeLock=await navigator.wakeLock.request("screen");}catch(e){}}
+document.addEventListener("visibilitychange",()=>{if(saverOn&&document.visibilityState==="visible")keepAwake();});
+function poke(){if(!saverOn)return;root.classList.remove("idle");clearTimeout(idleTimer);idleTimer=setTimeout(()=>root.classList.add("idle"),3500);}
+["mousemove","pointerdown","keydown","touchstart"].forEach(ev=>document.addEventListener(ev,poke,{passive:true}));
+function enterSaver(withGesture){
+  if(saverOn)return;saverOn=true;root.classList.add("saver");
+  themeIdx=0;colorTimer=setInterval(()=>{themeIdx=(themeIdx+1)%THEMES.length;applyTheme(themeIdx);},60000); // 1분마다 색 바뀜
+  refreshTimer=setInterval(()=>refresh(true),5*60000); // 5분마다 도장 수 새로 불러오기
+  keepAwake();poke();Music.shuffle();
+  try{wantMusic=localStorage.getItem("saverMusic")!=="off";}catch(e){}
+  if(withGesture){root.requestFullscreen?.().catch(()=>{});if(wantMusic)Music.play();}
+  else $("saverTap").classList.add("on"); // 브라우저 정책: 한 번 눌러야 소리가 나요
+}
+function exitSaver(){
+  if(!saverOn)return;saverOn=false;root.classList.remove("saver","idle");
+  clearInterval(colorTimer);clearInterval(refreshTimer);clearTimeout(idleTimer);
+  ["--a","--a2","--bg1","--bg2"].forEach(p=>root.style.removeProperty(p));
+  Music.pause();$("saverTap").classList.remove("on");
+  try{wakeLock?.release();}catch(e){}wakeLock=null;
+  if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});
+  const u=new URL(location.href);if(u.searchParams.has("saver")){u.searchParams.delete("saver");history.replaceState(null,"",u);}
+}
+$("btnSaver").onclick=()=>enterSaver(true);
+$("saverExit").onclick=exitSaver;
+$("saverTap").onclick=()=>{$("saverTap").classList.remove("on");root.requestFullscreen?.().catch(()=>{});if(wantMusic)Music.play();};
+$("musPlay").onclick=()=>{if(Music.playing){Music.pause();try{localStorage.setItem("saverMusic","off");}catch(e){}}else{Music.play();try{localStorage.setItem("saverMusic","on");}catch(e){}}};
+$("musNext").onclick=()=>Music.next();
+$("musVol").value=Math.round(Music.vol*100);
+$("musVol").oninput=e=>Music.setVol(e.target.value/100);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&saverOn&&!document.fullscreenElement)exitSaver();});
+// TV 리모컨: 확인(OK)=음악 시작/재생·정지, ▶▶=다음 곡, 뒤로가기=화면보호기 끄기
+document.addEventListener("keydown",e=>{if(!saverOn)return;const k=e.keyCode;
+  if(k===13){e.preventDefault();if($("saverTap").classList.contains("on"))$("saverTap").click();else $("musPlay").click();}
+  else if(k===417||k===39){e.preventDefault();Music.next();}
+  else if(k===415||k===19){e.preventDefault();$("musPlay").click();}
+  else if(k===461||k===8){e.preventDefault();exitSaver();}});
+document.addEventListener("fullscreenchange",()=>{if(!document.fullscreenElement&&saverOn)exitSaver();});
 </script>
 </body>
 </html>
