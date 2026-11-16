@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>우리 반 집단보상</title>
+<meta name="theme-color" content="#FF5A4E">
+<style>
+:root{--a:#FF5A4E;--a2:#F0392B;--ink:#1a1a1a;--m:#8a8a8a;--line:#eee;--gold:#8a6d00}
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Pretendard","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+body{background:linear-gradient(160deg,#fff,#fff0ee);min-height:100vh;color:var(--ink)}
+button{border:none;border-radius:12px;font-weight:700;font-family:inherit;cursor:pointer;background:#eee;color:#111}
+button.p{background:var(--a);color:#fff}
+button:disabled{opacity:.5;cursor:default}
+input{border:1px solid var(--line);border-radius:12px;padding:0 14px;font-size:16px;font-family:inherit;background:#fff;height:46px;width:100%}
+input:focus{outline:2px solid var(--a);border-color:transparent}
+.hidden{display:none!important}
+.msg{font-size:14px;min-height:20px;margin-top:8px}.msg.err{color:var(--a2)}.msg.ok{color:#1b8a4b}
+.stamp{display:inline-block;color:var(--a);border:4px solid var(--a);border-radius:14px;padding:2px 14px;font-size:clamp(18px,2.2vw,26px);font-weight:900;transform:rotate(-4deg);box-shadow:inset 0 0 0 3px #000,inset 0 0 0 5px var(--a);white-space:nowrap}
+
+/* 로그인 / 반고르기 */
+.center{max-width:420px;margin:0 auto;padding:48px 18px}
+.card{background:#fff;border-radius:18px;padding:26px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.center h1{font-size:22px;margin:18px 0 10px}
+.center input{margin-bottom:10px}
+.center button.p{width:100%;height:48px;margin-top:4px}
+.link{color:var(--m);font-size:14px;text-align:center;margin-top:14px;cursor:pointer;text-decoration:underline}
+.note{font-size:13px;color:var(--m);line-height:1.6}
+.list{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+.li{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--line);border-radius:14px}
+.li .nm{flex:1}.li .nm b{font-size:16px}.li .nm small{display:block;color:var(--m);font-size:12px}
+.li button{height:34px;padding:0 12px;font-size:13px}
+
+/* 디스플레이 */
+.wrap{max-width:1280px;margin:0 auto;min-height:100vh;padding:clamp(18px,3vw,44px);display:flex;flex-direction:column}
+.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.top h1{font-size:clamp(18px,2.6vw,32px);font-weight:900}
+.top .sp{flex:1}
+.ibtn{height:44px;padding:0 16px;font-size:15px;display:flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line)}
+.ibtn.p{background:var(--a);color:#fff;border:none}
+.updated{font-size:13px;color:var(--m);font-weight:700;width:100%;margin-top:2px}
+.hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:clamp(14px,3vw,36px) 0}
+.bignum{text-align:center}
+.bignum .n{font-size:clamp(84px,14vw,150px);font-weight:900;color:var(--a);line-height:.88;letter-spacing:-4px}
+.bignum .g{font-size:clamp(17px,2.3vw,28px);color:#9a9a9a;font-weight:800;margin-top:6px}
+.next{margin-top:16px;background:#fff3c4;color:var(--gold);font-weight:800;font-size:clamp(15px,1.8vw,22px);padding:10px 22px;border-radius:40px;display:inline-block}
+.next.done{background:#e7f8ec;color:#1b8a4b}
+.footer{margin-top:auto}
+.track{position:relative;height:clamp(42px,5vw,60px);background:#ececec;border-radius:40px;margin-top:10px;box-shadow:inset 0 2px 5px #0000000f}
+.fill{position:absolute;inset:0;width:0;background:linear-gradient(90deg,#FF8A5A,var(--a2));border-radius:40px;display:flex;align-items:center;justify-content:flex-end;transition:width 1s cubic-bezier(.3,1,.4,1);min-width:38px}
+.fill svg{width:clamp(22px,2.6vw,30px);height:clamp(22px,2.6vw,30px);margin-right:14px;fill:#fff}
+.mile{position:absolute;top:0;transform:translateX(-50%);text-align:center;pointer-events:none}
+.mile .pin{font-size:clamp(26px,3.4vw,38px);transform:translateY(-46%);filter:grayscale(.5) opacity(.55);transition:.4s}
+.mile.done .pin{filter:none;transform:translateY(-46%) scale(1.12)}
+.mile .lb{font-size:clamp(12px,1.3vw,16px);font-weight:800;color:#888;margin-top:6px;white-space:nowrap}
+.mile.done .lb{color:var(--a2)}
+.chips{display:flex;gap:9px;justify-content:center;margin-top:clamp(16px,2.4vw,28px);flex-wrap:wrap}
+.chip{background:#fff;border:2px solid #ffd9d3;border-radius:40px;padding:7px 15px;font-weight:800;font-size:clamp(13px,1.4vw,16px);display:flex;align-items:center;gap:6px}
+.chip b{color:var(--a)}
+
+/* 설정 다이얼로그 */
+dialog{border:none;border-radius:18px;padding:22px;max-width:460px;width:94%;position:relative}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog h2{font-size:19px;margin-bottom:4px}
+.fld{margin-top:14px}
+.fld label{display:block;font-weight:800;font-size:14px;margin-bottom:6px}
+.fld .note{margin-top:4px}
+.rw-ed{display:flex;flex-direction:column;gap:7px}
+.rw-row{display:flex;align-items:center;gap:6px}
+.rw-emoji{width:44px;height:42px;font-size:20px;border:1px solid var(--line);border-radius:10px;background:#fff;flex:none}
+.rw-emoji:hover{border-color:var(--a)}
+.rw-row input.rw-v{width:70px;height:42px;text-align:center;padding:0 6px;font-size:14px}
+.rw-row input.rw-name{flex:1;min-width:0;width:auto;height:42px;padding:0 10px;font-size:14px}
+.rw-del{width:34px;height:42px;background:#f4f4f4;color:var(--a2);flex:none;font-weight:800}
+.rw-del:hover{background:#ffe3df}
+.add-rw{margin-top:9px;width:100%;height:42px;border:1.5px dashed #ffbdb4;background:#fff6f4;color:var(--a);border-radius:11px;font-weight:800}
+.emoji-pop{position:absolute;z-index:40;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 28px #0003;padding:8px;display:grid;grid-template-columns:repeat(6,1fr);gap:3px;width:240px}
+.emoji-pop[hidden]{display:none}
+.emoji-pop button{height:34px;font-size:19px;background:#fff;border-radius:8px}
+.emoji-pop button:hover{background:#f2f2f2}
+.dlg-acts{display:flex;gap:8px;margin-top:18px}
+.dlg-acts button{flex:1;height:46px}
+.sub-acts{display:flex;justify-content:space-between;margin-top:14px;font-size:13px}
+.sub-acts span{color:var(--m);cursor:pointer;text-decoration:underline}
+.celebrate{position:fixed;inset:0;pointer-events:none;z-index:60;overflow:hidden}
+.confetti{position:absolute;top:-20px;width:10px;height:14px;animation:fall 2.6s linear forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(540deg)}}
+.spin{display:inline-block;animation:sp 1s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<!-- 로그인 -->
+<section id="login" class="center hidden">
+  <div class="card">
+    <span class="stamp">참 잘했어요!</span>
+    <h1>집단보상 게시 화면</h1>
+    <p class="note" style="margin-bottom:14px">선생님 계정으로 로그인하면 우리 반 도장을 모아 보여줘요.</p>
+    <input id="email" type="email" placeholder="이메일" autocomplete="username">
+    <input id="pw" type="password" placeholder="비밀번호" autocomplete="current-password">
+    <button class="p" id="btnLogin">로그인</button>
+    <div class="msg" id="loginMsg"></div>
+    <div class="link" id="btnForgot">비밀번호를 잊었어요 (재설정 메일 받기)</div>
+  </div>
+</section>
+
+<!-- 반 고르기 -->
+<section id="picker" class="center hidden">
+  <div class="card">
+    <span class="stamp">참 잘했어요!</span>
+    <h1>반 고르기</h1>
+    <p class="note">집단보상을 보여줄 반을 골라요.</p>
+    <div class="list" id="pickerList"></div>
+    <div class="link" id="btnLogout2">로그아웃</div>
+  </div>
+</section>
+
+<!-- 디스플레이 -->
+<div id="display" class="hidden"><div class="wrap">
+  <div class="top">
+    <span class="stamp">참 잘했어요!</span>
+    <h1 id="title">우리 반이 함께 모은 칭찬 도장</h1>
+    <span class="sp"></span>
+    <button class="ibtn p" id="btnRefresh">🔄 새로고침</button>
+    <button class="ibtn" id="btnSettings">⚙️ 설정</button>
+    <div class="updated" id="updated"></div>
+  </div>
+  <div class="hero">
+    <div class="bignum"><div class="n" id="cur">0</div><div class="g">／ 목표 <span id="goalTxt">500</span>개</div></div>
+    <div class="next" id="next"></div>
+  </div>
+  <div class="footer">
+    <div class="track"><div class="fill" id="fill"><svg viewBox="0 0 24 24"><rect x="2" y="10" width="4.5" height="11" rx="1"/><path d="M8.5 21V10.5L12.6 3.2c.3-.5.8-.7 1.3-.6 1.2.3 1.9 1.5 1.6 2.7L14.6 9H20a2 2 0 0 1 2 2.3l-1.3 7.5A2.6 2.6 0 0 1 18.1 21H8.5z"/></svg></div>
+      <div id="miles"></div>
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+</div></div>
+
+<!-- 설정 -->
+<dialog id="setDlg">
+  <h2>⚙️ 집단보상 설정</h2>
+  <p class="note">정한 내용은 우리 반에 저장돼요.</p>
+  <div class="fld">
+    <label>기준날짜 (이 날부터 도장을 모아요)</label>
+    <input type="date" id="setStart">
+    <p class="note">최근 날짜(예: 이번 주)로 잡으면 정확해요. 과거로 잡으면 지난 주는 기록(달성률)으로 추정 집계돼요.</p>
+  </div>
+  <div class="fld">
+    <label>목표 개수</label>
+    <input type="number" id="setGoal" min="1" value="500">
+  </div>
+  <div class="fld">
+    <label>보상 단계 <span class="note" style="font-weight:600">(이모지를 눌러 바꿔요)</span></label>
+    <div id="rwEditor" class="rw-ed"></div>
+    <button class="add-rw" id="addRw">＋ 보상 추가</button>
+  </div>
+  <div class="dlg-acts"><button id="setCancel">닫기</button><button class="p" id="setSave">저장</button></div>
+  <div class="msg" id="setMsg"></div>
+  <div class="sub-acts"><span id="btnSwitch">반 바꾸기</span><span id="btnLogout">로그아웃</span></div>
+  <div id="emojiPop" class="emoji-pop" hidden></div>
+</dialog>
+
+<div class="celebrate" id="celebrate"></div>
+
+<script type="module">
+const firebaseConfig = { apiKey:"AIzaSyC0rbFrct_9AgaVffxxcqitqJCJufRS9_Q", authDomain:"hani-praise.firebaseapp.com", projectId:"hani-praise" };
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, getDoc, getDocs, collection, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const app=initializeApp(firebaseConfig), auth=getAuth(app), db=getFirestore(app);
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const DEFAULT_REWARDS=[{v:100,name:'팝콘',ic:'🍿'},{v:250,name:'영화',ic:'🎬'},{v:400,name:'피자',ic:'🍕'},{v:500,name:'파티',ic:'🎉'}];
+const EMOJIS=['🍿','🎬','🍕','🎉','🎈','🥳','🎁','🏆','⭐','🌟','🍦','🧃','🍪','🍫','🍩','🧁','🍉','🍭','🎮','🚀','🏕️','🎵','🐥','❤️'];
+function iconSvg(key,size=22){const p={thumb:'<rect x="2" y="10" width="4.5" height="11" rx="1"/><path d="M8.5 21V10.5L12.6 3.2c.3-.5.8-.7 1.3-.6 1.2.3 1.9 1.5 1.6 2.7L14.6 9H20a2 2 0 0 1 2 2.3l-1.3 7.5A2.6 2.6 0 0 1 18.1 21H8.5z"/>'}[key]||'';return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor">${p}</svg>`;}
+function say(id,t,ok){const e=$(id);e.textContent=t;e.className="msg "+(ok?"ok":"err");}
+function authMsg(e){const c=e?.code||"";if(c.includes("invalid-cred")||c.includes("wrong-password"))return"이메일 또는 비밀번호가 맞지 않아요";if(c.includes("user-not-found"))return"가입되지 않은 이메일이에요";if(c.includes("too-many"))return"잠시 후 다시 해 주세요";if(c.includes("network"))return"인터넷 연결을 확인해 주세요";return e?.message||"문제가 생겼어요";}
+function mondayStr(off=0){const d=new Date();const day=(d.getDay()+6)%7;d.setDate(d.getDate()-day-off*7);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;}
+function mondayOf(s){const d=new Date(s+"T00:00:00");if(isNaN(d))return mondayStr();const day=(d.getDay()+6)%7;d.setDate(d.getDate()-day);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;}
+function getPL(st){const periods=Array.isArray(st.periods)&&st.periods.length===5?st.periods:[6,7,6,7,6];const leave=Array.isArray(st.leave)&&st.leave.length===5?st.leave:[0,0,0,0,0];const lv=d=>(leave[d]>=2&&leave[d]<=periods[d])?leave[d]:0;const isOff=(d,p)=>lv(d)&&p>=lv(d);return{periods,lv,isOff};}
+function stampCount(st){const mon=mondayStr();if(st.week!==mon)return 0;const{periods,isOff}=getPL(st);let n=0;for(let d=0;d<5;d++){const bits=(st.days||[])[d]||"";for(let i=0;i<periods[d];i++){if(isOff(d,i+1))continue;if(bits[i]&&bits[i]!=="0")n++;}}return n;}
+// 과거 주 추정 (기록 pct × 현재 시간표 기준 가능 칸수)
+function availSlots(st){const{periods,isOff}=getPL(st);let a=0;for(let d=0;d<5;d++)for(let i=0;i<periods[d];i++)if(!isOff(d,i+1))a++;return a;}
+function reconstructPast(startMon,W){let sum=0;for(const st of students){const A=availSlots(st);for(const h of (st.hist||[])){if(h.w>=startMon&&h.w<W)sum+=Math.round((h.p||0)/100*A);}}return sum;}
+
+let myUid=null, cid=null, cls=null, students=[], myClassList=[];
+let cur={total:0,S:0,start:mondayStr(),goal:500,rewards:DEFAULT_REWARDS,archive:0}, celebratedAt=-1;
+
+function show(sec){["login","picker","display"].forEach(s=>$(s).classList.toggle("hidden",s!==sec));}
+
+// ── 로그인 ──
+$("btnLogin").onclick=async()=>{say("loginMsg","");const em=$("email").value.trim(),pw=$("pw").value;if(!em||!pw)return say("loginMsg","이메일과 비밀번호를 넣어 주세요");try{await signInWithEmailAndPassword(auth,em,pw);}catch(e){say("loginMsg",authMsg(e));}};
+$("pw").addEventListener("keydown",e=>{if(e.key==="Enter")$("btnLogin").click();});
+$("btnForgot").onclick=async()=>{const em=$("email").value.trim();if(!em)return say("loginMsg","이메일을 먼저 적어 주세요");try{await sendPasswordResetEmail(auth,em);say("loginMsg","재설정 메일을 보냈어요",true);}catch(e){say("loginMsg",authMsg(e));}};
+$("btnLogout").onclick=()=>signOut(auth); $("btnLogout2").onclick=()=>signOut(auth);
+
+async function myClasses(uid){const[a,b]=await Promise.all([getDocs(query(collection(db,"classes"),where("owner","==",uid))),getDocs(query(collection(db,"classes"),where("members","array-contains",uid)))]);const map={};[...a.docs,...b.docs].forEach(d=>{map[d.id]={id:d.id,name:d.data().name||"우리 반",owner:d.data().owner===uid};});return Object.values(map);}
+function renderPicker(){$("pickerList").innerHTML=myClassList.map(c=>`<div class="li"><span class="nm"><b>${esc(c.name)}</b><small>${c.owner?"내가 만든 반":"초대받은 반"}</small></span><button class="p" data-enter="${c.id}">선택</button></div>`).join("")||`<p class="note">들어갈 반이 없어요. 선생님 앱에서 반을 먼저 만들어 주세요.</p>`;}
+$("pickerList").onclick=e=>{const b=e.target.closest("[data-enter]");if(b)enterClass(b.dataset.enter);};
+$("btnSwitch").onclick=async()=>{$("setDlg").close();myClassList=await myClasses(myUid);renderPicker();show("picker");};
+
+onAuthStateChanged(auth,async user=>{
+  if(!user||user.isAnonymous){myUid=null;show("login");return;}
+  myUid=user.uid;
+  try{
+    const t=await getDoc(doc(db,"teachers",user.uid));const saved=t.data()?.classId;
+    myClassList=await myClasses(user.uid);
+    if(saved&&myClassList.some(c=>c.id===saved))enterClass(saved);
+    else if(myClassList.length===1)enterClass(myClassList[0].id);
+    else if(myClassList.length){renderPicker();show("picker");}
+    else{show("picker");$("pickerList").innerHTML=`<p class="note">들어갈 반이 없어요. 선생님 앱에서 반을 먼저 만들어 주세요.</p>`;}
+  }catch(e){show("login");say("loginMsg",authMsg(e));}
+});
+
+async function enterClass(id){cid=id;show("display");await refresh(true);}
+
+// ── 핵심: 집계 + 저장 ──
+let busy=false;
+function setBusy(b){busy=b;$("btnRefresh").disabled=b;$("btnRefresh").innerHTML=b?'<span class="spin">🔄</span> 불러오는 중…':'🔄 새로고침';}
+async function refresh(persist){
+  if(!cid||busy)return; setBusy(true);
+  try{
+    const[cs,ss]=await Promise.all([getDoc(doc(db,"classes",cid)),getDocs(collection(db,"classes",cid,"students"))]);
+    cls=cs.data()||{}; students=ss.docs.map(d=>({id:d.id,...d.data()}));
+    $("title").textContent=`${cls.name||"우리 반"}이 함께 모은 칭찬 도장`;
+    const W=mondayStr(), S=students.reduce((a,st)=>a+stampCount(st),0);
+    const tr=cls.teamReward||{};
+    const goal=+tr.goal||500;
+    const rewards=Array.isArray(tr.rewards)&&tr.rewards.length?tr.rewards:DEFAULT_REWARDS;
+    let start=tr.start||W, archive, lastWk, lastWkSum;
+    const reinit = !tr.start || !tr.lastWk;         // 최초 또는 기준날짜 변경
+    if(reinit){ start=tr.start||W; archive=reconstructPast(mondayOf(start),W); lastWk=W; lastWkSum=S; }
+    else{
+      archive=+tr.archive||0; lastWk=tr.lastWk; lastWkSum=+tr.lastWkSum||0;
+      if(lastWk===W){ lastWkSum=S; }            // 같은 주: 라이브로 표시
+      else{ archive+=lastWkSum; lastWk=W; lastWkSum=S; }  // 주 바뀜: 지난 주 적립
+    }
+    const total=archive+S;
+    cur={total,S,start,goal,rewards,archive};
+    if(persist){ try{ await updateDoc(doc(db,"classes",cid),{"teamReward.start":start,"teamReward.archive":archive,"teamReward.lastWk":lastWk,"teamReward.lastWkSum":lastWkSum,"teamReward.goal":goal,"teamReward.rewards":rewards,"teamReward.updatedAt":Date.now()}); }catch(e){} }
+    render(); stampUpdatedTime();
+  }catch(e){ alert("불러오지 못했어요: "+authMsg(e)); }
+  finally{ setBusy(false); }
+}
+function stampUpdatedTime(){const d=new Date();const hh=d.getHours(),mm=String(d.getMinutes()).padStart(2,"0");const ap=hh<12?"오전":"오후";const h12=((hh+11)%12)+1;$("updated").textContent=`${cur.start}부터 모으는 중 · 마지막 업데이트 ${ap} ${h12}:${mm}`;}
+
+function animateNum(el,to){const from=+el.dataset.v||0;if(from===to){el.textContent=to;return;}const t0=performance.now();function step(t){const k=Math.min(1,(t-t0)/700),e=1-Math.pow(1-k,3);el.textContent=Math.round(from+(to-from)*e);if(k<1)requestAnimationFrame(step);else el.dataset.v=to;}requestAnimationFrame(step);el.dataset.v=to;}
+function render(){
+  const{total,goal}=cur;
+  const pct=Math.max(0,Math.min(100,goal?total/goal*100:0));
+  $("goalTxt").textContent=goal; $("fill").style.width=pct+"%"; animateNum($("cur"),total);
+  const rw=[...cur.rewards].filter(r=>r.v>0).sort((a,b)=>a.v-b.v);
+  const next=rw.find(r=>r.v>total); const nx=$("next");
+  if(!next){nx.className="next done";nx.textContent="🎉 목표 달성! 모두 축하해요";}
+  else{nx.className="next";nx.textContent=`${next.ic} ${next.name}까지 ${next.v-total}개 남았어요!`;}
+  $("miles").innerHTML=rw.map(r=>{const done=total>=r.v;return `<div class="mile ${done?"done":""}" style="left:${Math.min(100,r.v/goal*100)}%"><div class="pin">${r.ic}</div><div class="lb">${r.v}개·${esc(r.name)}</div></div>`;}).join("");
+  const contrib=students.map(st=>({n:st.name||"학생",c:stampCount(st)})).sort((a,b)=>b.c-a.c);
+  $("chips").innerHTML=contrib.map(s=>`<span class="chip">${esc(s.n)} <b>${s.c}</b></span>`).join("");
+  if(next===undefined&&celebratedAt!==goal){celebratedAt=goal;confetti();}
+  if(next!==undefined)celebratedAt=-1;
+}
+function confetti(){const box=$("celebrate"),cols=["#FF5A4E","#FFD24A","#34C759","#5AA9FF","#AF52DE","#FF6FA8"];for(let i=0;i<120;i++){const c=document.createElement("div");c.className="confetti";c.style.left=Math.random()*100+"%";c.style.background=cols[i%cols.length];c.style.animationDelay=(Math.random()*0.6)+"s";c.style.transform=`rotate(${Math.random()*360}deg)`;box.appendChild(c);setTimeout(()=>c.remove(),3200);}}
+
+$("btnRefresh").onclick=()=>refresh(true);
+
+// ── 설정 다이얼로그 ──
+let REWARDS=[];
+$("btnSettings").onclick=()=>{
+  REWARDS=cur.rewards.map(r=>({...r}));
+  $("setStart").value=cur.start; $("setGoal").value=cur.goal;
+  renderEditor(); say("setMsg",""); $("setDlg").showModal();
+};
+$("setCancel").onclick=()=>$("setDlg").close();
+function renderEditor(){$("rwEditor").innerHTML=REWARDS.map((r,i)=>`<div class="rw-row"><button class="rw-emoji" data-emoji="${i}">${r.ic}</button><input class="rw-v" type="number" min="1" value="${r.v}" data-v="${i}"><input class="rw-name" type="text" value="${esc(r.name)}" placeholder="보상 이름" data-name="${i}"><button class="rw-del" data-del="${i}">✕</button></div>`).join("");}
+let popFor=-1;
+function openPop(i,btn){popFor=i;const pop=$("emojiPop");pop.innerHTML=EMOJIS.map(e=>`<button data-pick="${e}">${e}</button>`).join("");pop.hidden=false;const r=btn.getBoundingClientRect(),pr=$("setDlg").getBoundingClientRect();pop.style.left=Math.max(6,r.left-pr.left)+"px";pop.style.top=(r.bottom-pr.top+6)+"px";}
+function closePop(){$("emojiPop").hidden=true;popFor=-1;}
+$("rwEditor").addEventListener("input",e=>{const vi=e.target.dataset.v,ni=e.target.dataset.name;if(vi!==undefined)REWARDS[+vi].v=Math.max(1,+e.target.value||1);if(ni!==undefined)REWARDS[+ni].name=e.target.value;});
+$("rwEditor").addEventListener("click",e=>{const del=e.target.dataset.del,em=e.target.dataset.emoji;if(del!==undefined){REWARDS.splice(+del,1);renderEditor();closePop();}else if(em!==undefined){(popFor===+em&&!$("emojiPop").hidden)?closePop():openPop(+em,e.target);}});
+$("emojiPop").addEventListener("click",e=>{const p=e.target.dataset.pick;if(p===undefined)return;if(popFor>=0){REWARDS[popFor].ic=p;renderEditor();}closePop();});
+$("setDlg").addEventListener("click",e=>{if(!e.target.closest("#emojiPop")&&e.target.dataset.emoji===undefined)closePop();});
+$("addRw").onclick=()=>{const mx=REWARDS.reduce((m,r)=>Math.max(m,r.v),0);REWARDS.push({v:mx+100,name:'보상',ic:'🎁'});renderEditor();};
+$("setSave").onclick=async()=>{
+  const newStart=$("setStart").value||mondayStr();
+  const goal=Math.max(1,+$("setGoal").value||500);
+  const rewards=REWARDS.filter(r=>r.v>0).map(r=>({v:+r.v,name:(r.name||"보상").slice(0,10),ic:r.ic||"🎁"}));
+  const startChanged=newStart!==cur.start;
+  try{
+    const upd={"teamReward.start":newStart,"teamReward.goal":goal,"teamReward.rewards":rewards};
+    if(startChanged){upd["teamReward.archive"]=0;upd["teamReward.lastWk"]="";upd["teamReward.lastWkSum"]=0;} // 재집계 트리거
+    await updateDoc(doc(db,"classes",cid),upd);
+    $("setDlg").close(); await refresh(true);
+  }catch(e){say("setMsg",authMsg(e));}
+};
+</script>
+</body>
+</html>
