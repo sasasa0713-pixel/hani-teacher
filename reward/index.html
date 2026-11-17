@@ -77,12 +77,16 @@ input:focus{outline:2px solid var(--a);border-color:transparent}
 .slot{width:42px;height:42px;border-radius:50%;border:2px dashed #cfcfd4;background:#fafafa;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;color:#aaa;font-size:14px;flex:none}
 .slot .pn{font-size:9px;color:#bbb;font-weight:600}
 .slot.on{border-style:solid;background:#fff;box-shadow:inset 0 0 0 2px #fff,inset 0 0 0 4px currentColor}
+button.slot{font-family:inherit;padding:0;cursor:pointer;transition:transform .12s}
+button.slot:hover{transform:scale(1.08);border-color:var(--a)}
+button.slot:focus-visible{outline:3px solid var(--a);outline-offset:2px}
+.sb-tip{font-size:13px;color:var(--m);margin:-4px 0 10px}
 .slot.off{border:none;background:repeating-linear-gradient(-45deg,#eee 0 5px,#e2e2e6 5px 9px);color:#aaa}
 .who{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
 .whochip{display:inline-flex;align-items:center;gap:5px;border:1.5px solid currentColor;border-radius:50px;padding:3px 10px;font-size:13px;font-weight:700}
 
 /* 설정 다이얼로그 */
-dialog{border:none;border-radius:18px;padding:22px;max-width:460px;width:94%;position:relative}
+dialog{border:none;border-radius:18px;padding:22px;max-width:460px;width:94%;margin:auto;max-height:92vh;overflow:auto}
 dialog::backdrop{background:rgba(0,0,0,.45)}
 dialog h2{font-size:19px;margin-bottom:4px}
 .fld{margin-top:14px}
@@ -115,7 +119,6 @@ html.saver{transition:--a 6s ease,--a2 6s ease,--bg1 6s ease,--bg2 6s ease}
 html.saver body{overflow:hidden}
 html.saver.idle body{cursor:none}
 html.saver #btnRefresh,html.saver #btnSettings,html.saver #btnSaver{display:none}
-html.saver .chip{pointer-events:none}
 html.saver .fill{background:linear-gradient(90deg,var(--a),var(--a2))}
 html.saver .chip{border-color:color-mix(in srgb,var(--a) 30%,#fff)}
 html.saver #display .wrap{position:relative;z-index:1;animation:drift 140s ease-in-out infinite alternate}
@@ -218,7 +221,9 @@ html.saver.idle #saverBar{opacity:0;pointer-events:none}
 <dialog id="stuDlg">
   <h2 id="sbName"></h2>
   <div class="sb-top"><span class="sb-pct" id="sbPct"></span><span class="sb-sub" id="sbSub"></span></div>
+  <p class="sb-tip">빈 칸을 누르면 도장을 찍고, 찍힌 도장을 누르면 지워요.</p>
   <div class="daywrap" id="sbGrid"></div>
+  <div class="msg" id="sbMsg"></div>
   <div class="who" id="sbWho"></div>
   <div class="dlg-acts"><button class="p" id="sbClose">닫기</button></div>
 </dialog>
@@ -240,7 +245,7 @@ html.saver.idle #saverBar{opacity:0;pointer-events:none}
 const firebaseConfig = { apiKey:"AIzaSyC0rbFrct_9AgaVffxxcqitqJCJufRS9_Q", authDomain:"hani-praise.firebaseapp.com", projectId:"hani-praise" };
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, doc, getDoc, getDocs, collection, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, getDoc, getDocs, collection, updateDoc, query, where, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const app=initializeApp(firebaseConfig), auth=getAuth(app), db=getFirestore(app);
 const $=id=>document.getElementById(id);
@@ -354,8 +359,9 @@ $("btnRefresh").onclick=()=>refresh(true);
 // ── 학생 도장 현황판 ──
 $("chips").addEventListener("click",e=>{const b=e.target.closest("[data-sid]");if(b)openStu(b.dataset.sid);});
 $("sbClose").onclick=()=>$("stuDlg").close();
+let stuSid=null;
 function openStu(sid){
-  const st=students.find(s=>s.id===sid); if(!st)return;
+  const st=students.find(s=>s.id===sid); if(!st)return; stuSid=sid;
   const w=weekStats(st);
   $("sbName").textContent=st.name||"학생";
   $("sbPct").textContent=w.pct+"%";
@@ -367,15 +373,49 @@ function openStu(sid){
     const slots=Array.from({length:periods[d]},(_,i)=>{
       if(isOff(d,i+1))return `<div class="slot off"><span>${i+1}</span><span class="pn">조퇴</span></div>`;
       const m=(bits[i]&&bits[i]!=="0")?bits[i]:"0";
-      if(m!=="0"){const lk=lookFor(m);return `<div class="slot on" style="color:${hex(lk.color)}">${iconSvg(lk.icon,20)}</div>`;}
-      return `<div class="slot">${i+1}<span class="pn">교시</span></div>`;
+      if(m!=="0"){const lk=lookFor(m);return `<button class="slot on" data-d="${d}" data-i="${i}" data-on="1" title="${esc(lk.name)} 도장 · 누르면 지워요" style="color:${hex(lk.color)}">${iconSvg(lk.icon,20)}</button>`;}
+      return `<button class="slot" data-d="${d}" data-i="${i}" title="누르면 도장을 찍어요">${i+1}<span class="pn">교시</span></button>`;
     }).join("");
     return `<div class="dayrow ${d===today?"today":""}"><div class="dl">${["월","화","수","목","금"][d]}</div><div class="slots">${slots}</div></div>`;
   }).join("");
   const staff=Object.values(cls?.staff||{}).filter(s=>s.code&&s.code!=="1").sort((a,b)=>a.code<b.code?-1:1);
   $("sbWho").innerHTML=staff.length?`<span class="sb-sub" style="margin-right:4px">도장 주인</span>`+staff.map(s=>`<span class="whochip" style="color:${hex(s.color)}">${iconSvg(s.icon,15)}${esc(s.name)}</span>`).join(""):"";
-  $("stuDlg").showModal();
+  if(!$("stuDlg").open){ say("sbMsg",""); $("stuDlg").showModal(); }
 }
+// ── 도장 찍기 / 지우기 (선생님 앱과 같은 방식으로 저장) ──
+function myCode(){return cls?.staff?.[myUid]?.code||"1";}
+function storedWeekRec(s){if(!s.week)return null;const{periods,isOff}=getPL(s);let total=0,got=0;const dd=[];for(let d=0;d<5;d++){const bits=(s.days||[])[d]||"";let g=0,a=0;for(let i=0;i<periods[d];i++){if(isOff(d,i+1))continue;a++;if(bits[i]&&bits[i]!=="0")g++;}total+=a;got+=g;dd.push(a?Math.round(g*100/a):0);}return{w:s.week,p:total?Math.round(got*100/total):0,d:dd};}
+async function setStampTx(sid,d,i,on){
+  const code=myCode();
+  await runTransaction(db,async tx=>{
+    const ref=doc(db,"classes",cid,"students",sid);
+    const snap=await tx.get(ref);const s=snap.data()||{};
+    const{periods}=getPL(s);const mon=mondayStr();const same=s.week===mon;
+    const arr=[0,1,2,3,4].map(dd=>{const bits=same?((s.days||[])[dd]||""):"";return Array.from({length:periods[dd]},(_,k)=>(bits[k]&&bits[k]!=="0")?bits[k]:"0");});
+    const upd={};
+    if(!same){const rec=storedWeekRec(s);if(rec)upd.hist=(s.hist||[]).filter(h=>h.w!==rec.w).concat([rec]).sort((a,b)=>a.w<b.w?-1:1).slice(-60);upd.memo={};}
+    arr[d][i]=on?code:"0";
+    upd.week=mon;upd.days=arr.map(a=>a.join(""));upd.updatedAt=serverTimestamp();
+    if(on)upd.last={at:Date.now(),d,i,by:code};
+    tx.update(ref,upd);
+  });
+}
+let stamping=false;
+$("sbGrid").addEventListener("click",async e=>{
+  const el=e.target.closest("button[data-d]");if(!el||!stuSid||stamping)return;
+  const d=+el.dataset.d,i=+el.dataset.i,on=el.dataset.on!=="1";
+  stamping=true;el.style.opacity=".5";say("sbMsg","");
+  try{
+    await setStampTx(stuSid,d,i,on);
+    const snap=await getDoc(doc(db,"classes",cid,"students",stuSid));
+    const k=students.findIndex(s=>s.id===stuSid);if(k>=0)students[k]={id:stuSid,...snap.data()};
+    await refresh(true);
+    if(on){el.style.opacity="";}
+    openStu(stuSid);
+    const f=$("sbGrid").querySelector(`button[data-d="${d}"][data-i="${i}"]`);if(f)f.focus();
+  }catch(err){el.style.opacity="";say("sbMsg",authMsg(err));}
+  finally{stamping=false;}
+});
 
 // ── 설정 다이얼로그 ──
 let REWARDS=[];
@@ -508,9 +548,11 @@ $("musPlay").onclick=()=>{if(Music.playing){Music.pause();try{localStorage.setIt
 $("musNext").onclick=()=>Music.next();
 $("musVol").value=Math.round(Music.vol*100);
 $("musVol").oninput=e=>Music.setVol(e.target.value/100);
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&saverOn&&!document.fullscreenElement)exitSaver();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&saverOn&&!document.fullscreenElement&&!$("stuDlg").open)exitSaver();});
 // TV 리모컨: 확인(OK)=음악 시작/재생·정지, ▶▶=다음 곡, 뒤로가기=화면보호기 끄기
 document.addEventListener("keydown",e=>{if(!saverOn)return;const k=e.keyCode;
+  if($("stuDlg").open){if(k===461||k===8){e.preventDefault();$("stuDlg").close();}return;}
+  const fb=document.activeElement;if(k===13&&fb&&fb.closest&&fb.closest("#chips,#saverBar"))return;
   if(k===13){e.preventDefault();if($("saverTap").classList.contains("on"))$("saverTap").click();else $("musPlay").click();}
   else if(k===417||k===39){e.preventDefault();Music.next();}
   else if(k===415||k===19){e.preventDefault();$("musPlay").click();}
