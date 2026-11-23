@@ -272,6 +272,11 @@ function getPL(st){const periods=Array.isArray(st.periods)&&st.periods.length===
 function stampCount(st){const mon=mondayStr();if(st.week!==mon)return 0;const{periods,isOff}=getPL(st);let n=0;for(let d=0;d<5;d++){const bits=(st.days||[])[d]||"";for(let i=0;i<periods[d];i++){if(isOff(d,i+1))continue;if(bits[i]&&bits[i]!=="0")n++;}}return n;}
 // 과거 주 추정 (기록 pct × 현재 시간표 기준 가능 칸수)
 function availSlots(st){const{periods,isOff}=getPL(st);let a=0;for(let d=0;d<5;d++)for(let i=0;i<periods[d];i++)if(!isOff(d,i+1))a++;return a;}
+// 학생별 누적 도장 (기준날짜부터): 지난 주는 기록(달성률)으로 추정, 저장된 주는 정확히 셈
+function countDays(st){const{periods,isOff}=getPL(st);let n=0;for(let d=0;d<5;d++){const bits=(st.days||[])[d]||"";for(let i=0;i<periods[d];i++){if(isOff(d,i+1))continue;if(bits[i]&&bits[i]!=="0")n++;}}return n;}
+function cumCount(st){const W=mondayStr(),sm=mondayOf(cur.start);let n=stampCount(st);const A=availSlots(st);
+  for(const h of (st.hist||[])){if(h.w>=sm&&h.w<W&&h.w!==st.week)n+=Math.round((h.p||0)/100*A);}
+  if(st.week&&st.week!==W&&st.week>=sm)n+=countDays(st);return n;}
 function reconstructPast(startMon,W){let sum=0;for(const st of students){const A=availSlots(st);for(const h of (st.hist||[])){if(h.w>=startMon&&h.w<W)sum+=Math.round((h.p||0)/100*A);}}return sum;}
 
 let myUid=null, cid=null, cls=null, students=[], myClassList=[];
@@ -347,8 +352,8 @@ function render(){
   if(!next){nx.className="next done";nx.textContent="🎉 목표 달성! 모두 축하해요";}
   else{nx.className="next";nx.textContent=`${next.ic} ${next.name}까지 ${next.v-total}개 남았어요!`;}
   $("miles").innerHTML=rw.map(r=>{const done=total>=r.v;return `<div class="mile ${done?"done":""}" style="left:${Math.min(100,r.v/goal*100)}%"><div class="pin">${r.ic}</div><div class="lb">${r.v}개·${esc(r.name)}</div></div>`;}).join("");
-  const contrib=students.map(st=>({id:st.id,n:st.name||"학생",c:stampCount(st)})).sort((a,b)=>b.c-a.c);
-  $("chips").innerHTML=contrib.map(s=>`<button class="chip" data-sid="${s.id}">${esc(s.n)} <b>${s.c}</b> <span class="chev">›</span></button>`).join("");
+  const contrib=students.map(st=>({id:st.id,n:st.name||"학생",c:cumCount(st),w:stampCount(st)})).sort((a,b)=>b.c-a.c);
+  $("chips").innerHTML=contrib.map(s=>`<button class="chip" data-sid="${s.id}" title="누적 ${s.c}개 · 이번 주 ${s.w}개">${esc(s.n)} <b>${s.c}</b> <span class="chev">›</span></button>`).join("");
   if(next===undefined&&celebratedAt!==goal){celebratedAt=goal;confetti();}
   if(next!==undefined)celebratedAt=-1;
 }
